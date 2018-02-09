@@ -1,8 +1,5 @@
-from codecs import open
-from os import path
 import sys
 import os
-from setuptools import setup, find_packages
 
 options_ = sys.argv
 
@@ -63,6 +60,23 @@ if len(options_) > 1:
         print("\ninstalling pip for python 3...\n")
         test_ = os.popen('apt-get install -y python3-pip').read()
         if q_mode == False : print(test_)
+
+        #install ndg_httpsclient library for python 3
+        print("\ninstalling ndg_httpsclient for python 3...\n")
+        test_ = os.popen('pip3 install ndg_httpsclient').read()
+        if q_mode == False : print(test_)
+
+        #install setuptools library for python 3
+        print("\ninstalling setuptools for python 3...\n")
+        test_ = os.popen('pip3 install setuptools').read()
+        if q_mode == False : print(test_)
+
+        #install CaseInsensitiveDict library for python 3
+        print("\ninstalling CaseInsensitiveDict for python 3...\n")
+        test_ = os.popen('pip3 install CaseInsensitiveDict').read()
+        if q_mode == False : print(test_)
+
+
         #install selenium library for python 3
         print("\ninstalling selenium for python3....\n")
         test_ = os.popen('pip3 install selenium').read()
@@ -104,6 +118,10 @@ if len(options_) > 1:
         test_ = os.popen('apt-get install -y chromium-chromedriver').read()
         if q_mode == False : print(test_)
         pass
+
+from codecs import open
+from setuptools import setup, find_packages
+
 here = path.abspath(path.dirname(__file__))
 
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
