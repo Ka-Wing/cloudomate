@@ -17,7 +17,7 @@ from os import path
 from CaseInsensitiveDict import CaseInsensitiveDict
 from future import standard_library
 
-#from cloudomate import wallet as wallet_util
+from cloudomate import wallet as bitcoin_wallet_util
 from cloudomate.hoster.vpn.azirevpn import AzireVpn
 from cloudomate.hoster.vpn.mullvad import MullVad
 from cloudomate.hoster.vpn.vpnac_purchase import vpnacVPNPurchaser
@@ -30,7 +30,8 @@ from cloudomate.hoster.vps.pulseservers import Pulseservers
 from cloudomate.hoster.vps.undergroundprivate import UndergroundPrivate
 from cloudomate.util.fakeuserscraper import UserScraper
 from cloudomate.util.settings import Settings
-from cloudomate.ethereum_wallet import Wallet
+from cloudomate.ethereum_wallet import Wallet as ethereum_wallet
+from cloudomate.wallet import Wallet as bitcoin_wallet
 
 standard_library.install_aliases()
 
@@ -100,6 +101,7 @@ def add_vpn_turn_on(subparsers):
     parser_purchase.add_argument("provider", help="The specified provider", choices=providers['vpn'])
     parser_purchase.add_argument("-c", "--country", help="The location of the server through which you would like to "
                                                          "router traffic", choices=providers['vpn'])
+    parser_purchase.add_argument("-p", "--protocol", help="The protocol.")
 
 def add_vpn_turn_off(subparsers):
     parser_purchase = subparsers.add_parser("vpn-turn-off", help="Turn off active VPN service.")
@@ -180,7 +182,17 @@ def torguard_purchase_handler(args):
 
 #TODO KW DINESH
 def mullvad_purchase_handler(args):
-    pass
+    settings = Settings()
+    m = MullVad(settings)
+
+    if settings.has_key('client', 'walletpath'):
+        print("hallo1")
+        wallet = bitcoin_wallet(wallet_path=settings.get('client', 'walletpath'))
+    else:
+        print("hallo2")
+        wallet = bitcoin_wallet()
+
+    m.purchase(wallet)
 
 def add_wallet(subparsers):
     wallet_parsers = subparsers.add_parser("wallet")
@@ -202,6 +214,17 @@ def add_ethereum_wallet(subparsers):
     add_parser_wallet_getaddress(ethereum_subparsers)
     add_parser_wallet_getprivatekey(ethereum_subparsers)
     add_parser_wallet_getfees(ethereum_subparsers)
+
+def add_bitcoin_wallet(subparsers):
+    bitcoin_parsers = subparsers.add_parser("bitcoin")
+    bitcoin_parsers.set_defaults(type="wallet_type")
+    bitcoin_subparsers = bitcoin_parsers.add_subparsers(dest="command")
+    bitcoin_subparsers.required = True
+
+    add_parser_wallet_getbalance(bitcoin_subparsers)
+    add_parser_wallet_getaddress(bitcoin_subparsers)
+    add_parser_wallet_getprivatekey(bitcoin_subparsers)
+    add_parser_wallet_getfees(bitcoin_subparsers)
 
 def add_parser_wallet_getbalance(subparsers):
     parser_getbalance = subparsers.add_parser("getbalance", help="Get balance of wallet.")
@@ -256,16 +279,10 @@ def wallet_fees(args):
 
 
 def vpn_purchase(args):
-    print(args)
-    print(args.provider)
-    print(args.coin)
-
-    print("vpn_purchase()")
-
     if args.provider == "torguard":
         torguard_purchase_handler(args)
     elif args.provider == "mullvad":
-        pass
+        mullvad_purchase_handler(args)
     elif args.provider == "azirevpn":
         pass
     elif args.provider == "vpnac":
@@ -661,8 +678,8 @@ def _options_vps(p):
         bandwidth = "Unlimited" if option.bandwidth == sys.maxsize else str(option.bandwidth)
 
         # Calculate the estimated price
-        rate = wallet_util.get_rate("USD")
-        fee = wallet_util.get_network_fee()
+        rate = bitcoin_wallet_util.get_rate("USD")
+        fee = bitcoin_wallet_util.get_network_fee()
         gateway = p.get_gateway()
         estimate = gateway.estimate_price(option.price * rate) + fee  # BTC
         estimate = round(1000 * estimate, 2)  # mBTC
@@ -685,8 +702,8 @@ def _options_vpn(provider):
         speed = "Unlimited" if option.speed == sys.maxsize else option.speed
 
         # Calculate the estimated price
-        rate = wallet_util.get_rate("USD")
-        fee = wallet_util.get_network_fee()
+        rate = bitcoin_wallet_util.get_rate("USD")
+        fee = bitcoin_wallet_util.get_network_fee()
         gateway = provider.get_gateway()
         estimate = gateway.estimate_price(option.price * rate) + fee  # BTC
         estimate = round(1000 * estimate, 2)  # mBTC
@@ -698,9 +715,9 @@ def _register(provider, vps_option, settings):
     # For now use standard wallet implementation through Electrum
     # If wallet path is defined in config, use that.
     if settings.has_key('client', 'walletpath'):
-        wallet = Wallet(wallet_path=settings.get('client', 'walletpath'))
+        wallet = bitcoin_wallet(wallet_path=settings.get('client', 'walletpath'))
     else:
-        wallet = Wallet()
+        wallet = bitcoin_wallet()
 
     provider_instance = provider(settings)
     provider_instance.purchase(wallet, vps_option)

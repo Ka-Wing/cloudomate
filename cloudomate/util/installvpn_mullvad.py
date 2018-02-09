@@ -59,7 +59,7 @@ class InstallMullvad(object):
         # Sleep for 10 seconds, so that VPN connection can be established in the
         # mean time
         time.sleep(30)
-        self._check_vpn(True)
+        self._check_vpn()
 
     # Download configuration files for setting up VPN and extract them
     def _download_files(self, country):

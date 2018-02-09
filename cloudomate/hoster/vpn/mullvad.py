@@ -21,6 +21,7 @@ from cloudomate.hoster.vpn.vpn_hoster import VpnHoster, VpnOption, VpnStatus, Vp
 from cloudomate.util.captchasolver import CaptchaSolver
 
 from cloudomate.util.settings import Settings
+from cloudomate.util.captcha_account_manager import captchaAccountManager
 
 standard_library.install_aliases()
 
@@ -51,7 +52,7 @@ class MullVad(VpnHoster):
 
     @staticmethod
     def get_required_settings():
-        return {"captcha": ["captchaaccount"]}
+        return {"User": ["captchaaccount"]}
 
     '''
     Action methods of the Hoster that can be called
@@ -89,13 +90,15 @@ class MullVad(VpnHoster):
         # Add the remaining days to the current date to get expiration date
         return VpnStatus(online, now + expiration)
 
-    def purchase(self, wallet, option):
+    def purchase(self, wallet):
         #Check if account exists, else create new one
         try:
             self._settings.get("Mullvad", "accountnumber")
         except Exception as e:
+            print("exception chicker")
             self._register()
         else:
+            print("try else chicker")
             self._login()
         # Prepare for the purchase on the MullVad website
         page = self._order()
@@ -109,7 +112,7 @@ class MullVad(VpnHoster):
     def _register(self):
         #Check if account is in configuration file
         try:
-            self._settings.get("Anti Captcha", "anticaptchaaccount")
+            captchakey = captchaAccountManager().get_api_key()
         except Exception as e:
             print("Error: Anti Captcha account not found, please register one!")
             #print(self._error_message(e))
@@ -129,8 +132,7 @@ class MullVad(VpnHoster):
         # Check if registration was successful
         while page_url == self.REGISTER_URL:
             # Solve captcha
-            captcha_solver = CaptchaSolver(self._settings.get("Anti Captcha",
-                                                              "anticaptchaaccount"))
+            captcha_solver = CaptchaSolver(captchakey)
             solution = captcha_solver.solve_captcha_text_case_sensitive(
                 "./captcha.png")
             form["captcha_1"] = solution
