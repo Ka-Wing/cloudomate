@@ -121,6 +121,7 @@ if len(options_) > 1:
 
 from codecs import open
 from setuptools import setup, find_packages
+from os import path
 
 here = path.abspath(path.dirname(__file__))
 
