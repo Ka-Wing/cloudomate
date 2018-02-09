@@ -50,9 +50,8 @@ class installVpnAC():
                 self.saveToFile("UNKNOWN",service_expire_date_filedir)
             else :
                 self.saveToFile(openvpn_auth_active_until,service_expire_date_filedir)
-
             return
-            pass
+
         openvpn_auth_file = self.c_userpass_dir + '/' + self.userpass_file_name
         if os.path.isfile(openvpn_auth_file):
             file = open(openvpn_auth_file, "r")
@@ -62,7 +61,6 @@ class installVpnAC():
             print("--opnvpnusern found : " + self.vpnusern_)
             print("--opnvpnpassw found : " + self.vpnpassw_)
             return
-            pass
 
         web_login_file = os.path.expanduser("~") + '/.config/vpnac_login.txt'
         if os.path.isfile(web_login_file):
@@ -74,31 +72,46 @@ class installVpnAC():
             print("--web-login passw found: " + weblogin_passw)
             self.extractOpenVpnUserInfo(weblogin_user, weblogin_passw)
             return
-            pass
+
         elif openvpn_passw == None or openvpn_passw == None:
             print("\n**************************************\n\n")
             print("\nError: No login Credentials found file: 'vpnac_login.txt' does not exist in current path")
             print("\nPlease provide web-login crdentials by purchasing a vpnac service trough the vpnac_purchase.py script ")
             print("\nOR openvpn auth credentials (not the same as web credentials) manually as paramters directly to the script")
             print("\n\n**************************************\n\n")
-            raise Exception("no credentials for neither web scraping nor openvpn found")
-            pass
-        pass
+            print("\n\nno credentials for neither web scraping nor openvpn found")
+            exit(0)
 
+    def getCountries(self,UDP = False):
+        self.download_config_files(UDP)
+        c_dir = self.c_vpn_config_dir + '/' + self.c_config_AES256TCP_folder_name
+        if UDP == True:
+            c_dir = self.c_vpn_config_dir + '/' + self.c_config_AES256UDP_folder_name
 
-    def startVpn(self, UDP = False):
+        file_list = os.popen('ls ' + c_dir + '/').read()
+
+        options = file_list.splitlines()
+        return options
+
+    def startVpn(self, UDP = False, country_route = None):
 
         self.download_config_files(UDP)
         c_dir = self.c_vpn_config_dir + '/' + self.c_config_AES256TCP_folder_name
-        if UDP:
+        if UDP == True:
             c_dir = self.c_vpn_config_dir + '/' + self.c_config_AES256UDP_folder_name
-            pass
 
         file_list = os.popen('ls ' + c_dir + '/').read()
 
         options = file_list.splitlines()
         random_country = random.randint(0,len(options))
-        random_vpn = options[random_country]
+
+        random_vpn = None
+
+        if country_route != None:
+            if country_route in options:
+                random_vpn = country_route
+
+        if random_vpn == None: random_vpn = options[random_country]
         file_ = c_dir + '/' + random_vpn
         userpassfile = self.c_userpass_dir + '/' + self.userpass_file_name
         print(userpassfile)
@@ -115,16 +128,13 @@ class installVpnAC():
         #create config dir if they dont exist already
         if os.path.isdir(self.c_logdir) == False:
             os.popen('mkdir ' + self.c_logdir).read()
-            pass
         if os.path.isdir(self.c_vpn_config_dir) == False:
             os.popen('mkdir ' + self.c_vpn_config_dir).read()
-            pass
         if os.path.isdir(self.c_userpass_dir) == False:
             os.popen('mkdir ' + self.c_userpass_dir).read()
-            pass
 
         #full file path and file name to which we will save the vpn config zip file
-        file_test = os.path.dirname(os.path.realpath(__file__)) + '/vpnacconfig.zip'
+        file_test = os.path.expanduser("~") + '/vpnacconfig.zip'
 
         #the name of the folder that the zip file for the specified protocol wil extract
         foldername = self.c_config_AES256TCP_folder_name
@@ -133,10 +143,8 @@ class installVpnAC():
         if(UDP == True):
             foldername = self.c_config_AES256UDP_folder_name
             urllib.request.urlretrieve(self.configurl_files_url_AES_UDP, file_test)
-            pass
         else:
             urllib.request.urlretrieve(self.configurl_files_url_AES_TCP, file_test)
-            pass
 
         #unzip the openvpn config files to the config openvpn dir
         unzip_command = 'unzip -o ' + file_test + ' -d ' + self.c_vpn_config_dir + '/'
@@ -147,7 +155,6 @@ class installVpnAC():
 
         #remove the zip file after it has been unzipped to the config dir (zip file no longer needed)
         logging_info += os.popen('rm ' + file_test).read()
-        pass
 
     def extractOpenVpnUserInfo(self,login_username,login_password):
 
@@ -182,11 +189,8 @@ class installVpnAC():
                     if 'Next Due Date' in str(td):
                         self.service_auth_active_until = td.text
                         print("Service-Active-Until-value found : " + self.service_auth_active_until)
-                pass
-            pass
         if temphref == 'not set':
             print("\n\nhref >???????????? No Active vpn service found .. Perhaps it expired? \n")
-            pass
 
 
         #go to the page containing vpn user info needed for openvpn
@@ -212,9 +216,6 @@ class installVpnAC():
             print("\nOpenvpn Username: "  + self.vpnusern_)
             print("\nPassword set to: " + self.vpn_config_password_to_be_set + "\n\n")
             self.vpnpassw_ = self.vpn_config_password_to_be_set
-            pass
-
-        pass
 
         #save user info required for vpn
         contents = self.vpnusern_ + "\n" + self.vpnpassw_
@@ -223,13 +224,14 @@ class installVpnAC():
         self.saveToFile(contents,auth_filedir)
         service_expire_date_filedir = self.c_userpass_dir + '/' + self.service_expire_date_file_name
         self.saveToFile(self.service_auth_active_until,service_expire_date_filedir)
-
+    
+    def getStatus(self):
+        pass
 
     def saveToFile(self, file_contents, full_file_path):
         tempfile = open(full_file_path, 'w')
         tempfile.write(file_contents)
         tempfile.close()
-        pass
 
 if __name__ == '__main__':
     vpnac = installVpnAC()
