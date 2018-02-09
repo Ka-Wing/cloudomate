@@ -20,6 +20,7 @@ from future import standard_library
 from cloudomate import wallet as bitcoin_wallet_util
 from cloudomate.hoster.vpn.azirevpn import AzireVpn
 from cloudomate.hoster.vpn.mullvad import MullVad
+from cloudomate.util.installvpn_mullvad import InstallMullvad
 from cloudomate.hoster.vpn.vpnac_purchase import vpnacVPNPurchaser
 from cloudomate.hoster.vpn.torguard_purchase import torguardVPNPurchaser
 from cloudomate.hoster.vps.blueangelhost import BlueAngelHost
@@ -120,6 +121,7 @@ def add_agent_status_notifier(subparser):
     turnon_parser = subparser_captcha.add_parser("turnon", help ="Turn on the status notifier")
     turnon_parser.set_defaults(func=turnon_notifier)
     turnon_parser.add_argument("minutes", help="Amount of minutes.", type=int)
+    turnon_parser.add_arguments("recipient", help="Address where to send the email to")
 
     turnoff_parser = subparser_captcha.add_parser("turnoff", help="Turn off the status notifier.")
     turnoff_parser.set_defaults(func=turnoff_notifier)
@@ -184,14 +186,9 @@ def torguard_purchase_handler(args):
 def mullvad_purchase_handler(args):
     settings = Settings()
     m = MullVad(settings)
-
-    print("pik")
-
     if settings.has_key('client', 'walletpath'):
-        print("hallo1")
         wallet = bitcoin_wallet(wallet_path=settings.get('client', 'walletpath'))
     else:
-        print("hallo2")
         wallet = bitcoin_wallet()
 
     m.purchase(wallet)
@@ -311,7 +308,14 @@ def torguard_turn_on_handler(args):
 
 #TODO KW DINESH
 def mullvad_turn_on_handler(args):
-    pass
+    m = InstallMullvad()
+
+    if args.country is not None:
+        print("country: " + args.country)
+        m.setup_vpn(args.country)
+    else:
+        print("Jez.")
+        m.setup_vpn()
 
 #TODO PHILIP
 def vpnac_turn_on_handler(args):

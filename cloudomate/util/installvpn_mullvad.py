@@ -43,6 +43,9 @@ class InstallMullvad(object):
     def setup_vpn(self, country="se-sto"):
         # Get the necessary files for connecting to the VPN service
         self._download_files(country)
+        result = os.popen("sudo service openvpn stop").read()
+        print(result)
+        print("hier")
         result = os.popen("sudo chmod -R 777 " + self.c_vpn_config_dir)
 
         # Copy files to OpenVPN folder
@@ -52,12 +55,13 @@ class InstallMullvad(object):
         os.chdir("/etc/openvpn/")
 
         # Start OpenVPN connection
-        result = os.popen("sudo nohup openvpn --config ./mullvad_" + country + ".conf > /dev/null &").read()
-        # result = os.popen("sudo service openvpn start").read()
+        #result = os.popen("sudo nohup openvpn --config ./mullvad_" + country + ".conf > /dev/null &").read()
+        result = os.popen("sudo service openvpn start").read()
         print(result)
 
         # Sleep for 10 seconds, so that VPN connection can be established in the
         # mean time
+        print("sleep")
         time.sleep(30)
         self._check_vpn()
 

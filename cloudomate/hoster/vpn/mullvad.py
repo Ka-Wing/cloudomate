@@ -92,14 +92,10 @@ class MullVad(VpnHoster):
 
     def purchase(self, wallet):
         #Check if account exists, else create new one
-        try:
-            self._settings.get("Mullvad", "accountnumber")
-        except Exception as e:
-            print("exception chicker")
-            self._register()
-        else:
-            print("try else chicker")
+        if self._settings.has_key("Mullvad", "accountnumber"):
             self._login()
+        else:
+            self._register()
         # Prepare for the purchase on the MullVad website
         page = self._order()
 
@@ -167,11 +163,8 @@ class MullVad(VpnHoster):
 
     def _login(self):
         #Check if account is in configuration file
-        try:
-            self._settings.get("Mullvad", "accountnumber")
-        except Exception as e:
+        if not self._settings.get("Mullvad", "accountnumber"):
             print("Error: Account not found, please register one!")
-            #print(self._error_message(e))
             sys.exit(1)
 
         self._browser.open(self.LOGIN_URL)
