@@ -100,7 +100,7 @@ def add_vpn_turn_on(subparsers):
     parser_purchase.set_defaults(func=vpn_turn_on)
     parser_purchase.add_argument("provider", help="The specified provider", choices=providers['vpn'])
     parser_purchase.add_argument("-c", "--country", help="The location of the server through which you would like to "
-                                                         "router traffic", choices=providers['vpn'])
+                                                         "router traffic")
     parser_purchase.add_argument("-p", "--protocol", help="The protocol.")
 
 def add_vpn_turn_off(subparsers):
@@ -184,6 +184,8 @@ def torguard_purchase_handler(args):
 def mullvad_purchase_handler(args):
     settings = Settings()
     m = MullVad(settings)
+
+    print("pik")
 
     if settings.has_key('client', 'walletpath'):
         print("hallo1")
