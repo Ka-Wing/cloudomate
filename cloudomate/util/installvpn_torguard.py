@@ -51,7 +51,8 @@ class installVpnTorguard():
 
         web_login_file =  os.path.expanduser("~") + '/.config/torguard_login.txt'
         if os.path.isfile(web_login_file):
-            raise Exception("Only weblogin credentials found: please run torguard_service_auth_retriever.py before calling this script to retrieve service credentials from web credentials")
+            print("\n\nOnly weblogin credentials found: please run torguard_service_auth_retriever.py before calling this script to retrieve service credentials from web credentials")
+            exit(0)
             return
             pass
         elif openvpn_passw == None or openvpn_passw == None:
@@ -71,7 +72,7 @@ class installVpnTorguard():
         #Either set the config dir to point to eiter the TCP or UDP folder (depending on which was specified for download)
         self.download_config_files(UDP)
         c_dir = self.c_vpn_config_dir + '/' + self.c_config_AES256TCP_folder_name
-        if UDP:
+        if UDP == True:
             c_dir = self.c_vpn_config_dir + '/' + self.c_config_AES256UDP_folder_name
 
         #create a list of all the areas trough which traffic can be routed
@@ -87,7 +88,7 @@ class installVpnTorguard():
         return options
 
     #start vpn with either Standard TCP or UDP
-    def startVpn(self, UDP = False):
+    def startVpn(self, UDP = False, country_route = None):
 
         #Either set the config dir to point to eiter the TCP or UDP folder (depending on which was specified for download)
         self.download_config_files(UDP)
@@ -100,7 +101,7 @@ class installVpnTorguard():
         self.saveToFile(contents,filedir)
 
         c_dir = self.c_vpn_config_dir + '/' + self.c_config_AES256TCP_folder_name
-        if UDP:
+        if UDP == True:
             c_dir = self.c_vpn_config_dir + '/' + self.c_config_AES256UDP_folder_name
 
         #create a list of all the areas trough which traffic can be routed
@@ -117,8 +118,16 @@ class installVpnTorguard():
             use_ta_key = True
             options.remove('ta.key')
 
-        random_country = random.randint(0,len(options))
-        random_vpn = options[random_country]
+        random_country = random.randint(0,len(options)-1)
+
+        random_vpn = None
+        #check to route to country_route given by user
+        if country_route != None:
+            if country_route in options:
+                print("\n\nCountry found: " + country_route)
+                random_vpn = country_route
+
+        if random_vpn == None: random_vpn = options[random_country]
         file_ = c_dir + '/' + random_vpn
         userpassfile = self.c_userpass_dir + '/' + self.userpass_file_name
         print(userpassfile)
@@ -126,7 +135,7 @@ class installVpnTorguard():
         c_config_crt = self.c_vpn_config_dir + '/' + self.c_config_AES256TCP_folder_name + '/ca.crt'
         c_config_key = self.c_vpn_config_dir + '/' + self.c_config_AES256TCP_folder_name + '/ta.key'
 
-        if UDP:
+        if UDP == True:
             c_config_crt = self.c_vpn_config_dir + '/' + self.c_config_AES256UDP_folder_name + '/ca.crt'
             c_config_key = self.c_vpn_config_dir + '/' + self.c_config_AES256UDP_folder_name + '/ta.key'
 
