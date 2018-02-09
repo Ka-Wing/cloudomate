@@ -154,7 +154,7 @@ class installVpnTorguard():
             os.popen('mkdir ' + self.c_userpass_dir).read()
 
         #full file path and file name to which we will save the vpn config zip file
-        file_test = os.path.dirname(os.path.realpath(__file__)) + '/toruguardconfig.zip'
+        file_test = os.path.expanduser("~") + '/toruguardconfig.zip'
 
         #the name of the folder that the zip file for the specified protocol wil extract
         foldername = self.c_config_AES256TCP_folder_name
