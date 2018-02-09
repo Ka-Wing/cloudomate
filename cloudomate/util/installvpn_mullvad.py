@@ -40,23 +40,32 @@ class InstallMullvad(object):
                 break
 
     # Automatically sets up VPN with settings from provider
-    def setup_vpn(self, country="se-sto"):
+    def setup_vpn(self, country="random"):
         # Get the necessary files for connecting to the VPN service
         self._download_files(country)
-        result = os.popen("sudo service openvpn stop").read()
-        print(result)
-        print("hier")
-        result = os.popen("sudo chmod -R 777 " + self.c_vpn_config_dir)
+        result = os.popen("sudo killall openvpn").read()
+        #result = os.popen("sudo service openvpn stop").read()
+        
+        #Delete .conf file from openvpn folder
+        dir_name = "/etc/openvpn/"
+        openvpn_files = os.listdir(dir_name)
+
+        for file in openvpn_files:
+            if file.endswith(".conf"):
+                os.remove(os.path.join(dir_name, file))
 
         # Copy files to OpenVPN folder
         result = os.popen("sudo cp -a " + self.c_vpn_config_dir + "/. /etc/openvpn/").read()
         print(result)
 
+        #Delete all the downloaded files
+        shutil.rmtree(self.c_vpn_config_dir)
+
         os.chdir("/etc/openvpn/")
 
         # Start OpenVPN connection
-        #result = os.popen("sudo nohup openvpn --config ./mullvad_" + country + ".conf > /dev/null &").read()
-        result = os.popen("sudo service openvpn start").read()
+        result = os.popen("sudo nohup openvpn --config ./mullvad_" + country + ".conf > /dev/null &").read()
+        #result = os.popen("sudo service openvpn start").read()
         print(result)
 
         # Sleep for 10 seconds, so that VPN connection can be established in the
@@ -83,6 +92,7 @@ class InstallMullvad(object):
         # print(country_options)
         if 'value="' + country + '"' not in str(country_options):
             print("Error: Country code incorrect, please use one of the following country codes:")
+            print('"" Random')
             i = 2
             while i < len(country_options) - 1:
                 print(str(country_options[i]).split("=")[1].split(">")[0], end=' ')
@@ -101,6 +111,9 @@ class InstallMullvad(object):
         # Create the folder that will store the configuration files
         if os.path.isdir(self.c_vpn_config_dir) == False:
             os.popen('mkdir ' + self.c_vpn_config_dir).read()
+
+        #Give right permissions to the folder and its files
+        result = os.popen("sudo chmod -R 777 " + self.c_vpn_config_dir)
 
         # Download the zip file to the right location
         files_path = self.c_vpn_config_dir + "/config.zip"
@@ -128,5 +141,5 @@ if __name__ == '__main__':
     mullvad = InstallMullvad()
     mullvad._settings.put("Mullvad", "accountnumber", "6798499523758101")
     mullvad._settings.save_settings()
-    # mullvad.setup_vpn("blablad")
-    mullvad._check_vpn()
+    mullvad.setup_vpn("de")
+    #mullvad._check_vpn()

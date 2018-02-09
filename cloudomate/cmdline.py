@@ -311,10 +311,8 @@ def mullvad_turn_on_handler(args):
     m = InstallMullvad()
 
     if args.country is not None:
-        print("country: " + args.country)
         m.setup_vpn(args.country)
     else:
-        print("Jez.")
         m.setup_vpn()
 
 #TODO PHILIP
@@ -323,7 +321,26 @@ def vpnac_turn_on_handler(args):
 
 
 def vpn_turn_off(args):
-    print(args)
+    if args.provider == "torguard":
+        torguard_turn_off_handler(args)
+    elif args.provider == "mullvad":
+        mullvad_turn_off_handler()
+    elif args.provider == "azirevpn":
+        pass
+    elif args.provider == "vpnac":
+        vpnac_turn_off_handler(args)
+
+#TODO PHILIP
+def torguard_turn_off_handler(args):
+    pass
+
+#TODO KW DINESH
+def mullvad_turn_off_handler():
+    #Kills all active openvpn connections
+    result = os.popen("sudo killall openvpn").read()
+
+#TODO PHILIP
+def vpnac_turn_off_handler(args):
     pass
 
 
