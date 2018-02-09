@@ -30,7 +30,7 @@ from cloudomate.hoster.vps.pulseservers import Pulseservers
 from cloudomate.hoster.vps.undergroundprivate import UndergroundPrivate
 from cloudomate.util.fakeuserscraper import UserScraper
 from cloudomate.util.settings import Settings
-#from cloudomate.wallet import Wallet
+from cloudomate.ethereum_wallet import Wallet
 
 standard_library.install_aliases()
 
@@ -71,6 +71,7 @@ def execute(cmd=sys.argv[1:]):
     add_vpn_turn_off(subparsers)
     add_agent_status_notifier(subparsers)
     add_captcha_manager(subparsers)
+    add_wallet(subparsers)
     subparsers.required = True
 
     args = parser.parse_args(cmd)
@@ -180,6 +181,79 @@ def torguard_purchase_handler(args):
 #TODO KW DINESH
 def mullvad_purchase_handler(args):
     pass
+
+def add_wallet(subparsers):
+    wallet_parsers = subparsers.add_parser("wallet")
+    wallet_parsers.set_defaults(type="wallet")
+    wallet_subparsers = wallet_parsers.add_subparsers(dest="wallet_type")
+    #wallet_subparsers.add_argument("getbalance", help="Get balance of wallet.")
+    wallet_subparsers.required = True
+
+    add_ethereum_wallet(wallet_subparsers)
+    add_bitcoin_wallet(wallet_subparsers)
+
+def add_ethereum_wallet(subparsers):
+    ethereum_parsers = subparsers.add_parser("ethereum")
+    ethereum_parsers.set_defaults(type="wallet_type")
+    ethereum_subparsers = ethereum_parsers.add_subparsers(dest="command")
+    ethereum_subparsers.required = True
+
+    add_parser_wallet_getbalance(ethereum_subparsers)
+    add_parser_wallet_getaddress(ethereum_subparsers)
+    add_parser_wallet_getprivatekey(ethereum_subparsers)
+    add_parser_wallet_getfees(ethereum_subparsers)
+
+def add_parser_wallet_getbalance(subparsers):
+    parser_getbalance = subparsers.add_parser("getbalance", help="Get balance of wallet.")
+    parser_getbalance.set_defaults(type="command", func=wallet_getbalance)
+    parser_getbalance.add_argument("hallo", help="This is a test method")
+    parser_getbalance.add_argument("-a", "--armando", help="This is a test method")
+    #parser_getbalance.add_argument('v', help="v")
+    #parser_getbalance.set_argument('')
+    pass
+
+def add_parser_wallet_getaddress(subparsers):
+    parser_getbalance = subparsers.add_parser("getaddress", help="Get address of wallet.")
+    parser_getbalance.set_defaults(type="command", func=wallet_getaddress)
+    pass
+
+def add_parser_wallet_getprivatekey(subparsers):
+    parser_getbalance = subparsers.add_parser("getprivatekey", help="Get private key of wallet.")
+    parser_getbalance.set_defaults(type="command", func=wallet_getprivatekey)
+    pass
+
+def add_parser_wallet_getfees(subparsers):
+    parser_getbalance = subparsers.add_parser("getfees", help="Get fees of wallet.")
+    parser_getbalance.set_defaults(type="command", func=wallet_fees)
+    pass
+
+#TODO PHILIP
+def wallet_getbalance(args):
+    print(args)
+
+    print("wallet_getbalance()")
+    if args.wallet_type == "ethereum":
+        print("ethereum_wallet: This can be used to call any method.")
+
+#TODO PHILIP
+def wallet_getaddress(args):
+    print("wallet_getaddress()")
+    if args.wallet_type == "ethereum":
+        print("ethereum_wallet: This can be used to call any method.")
+
+#TODO PHILIP
+def wallet_getprivatekey(args):
+    print("wallet_getprivatekey()")
+    if args.wallet_type == "ethereum":
+        print("ethereum_wallet: This can be used to call any method.")
+
+#TODO PHILIP
+def wallet_fees(args):
+    print("wallet_getfees()")
+    if args.wallet_type == "ethereum":
+        print("ethereum_wallet: This can be used to call any method.")
+
+
 
 def vpn_purchase(args):
     print(args)
