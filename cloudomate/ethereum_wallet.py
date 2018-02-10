@@ -21,7 +21,7 @@ from cryptocompy import price
 # library used for ethereum
 import rlp 
 
-from web3 import Web3, HTTPProvider, IPCProvider
+from web3 import Web3, HTTPProvider, IPCProvider, eth
 from ethereum.transactions import Transaction
 from ethereum.utils import privtoaddr, checksum_encode, sha3, encode_hex
 
@@ -49,8 +49,7 @@ tx_hash = my_wallet.pay(address_to_send_eth, user_amount)
 print("Your txHash is :" + str(tx_hash))
 """
 
-NB_GAS_FOR_TRANSACTION = 21000
-GWEI_TO_ETHER = 0.000000001
+NB_GAS_FOR_TRANSACTION = 100000
 
 def determine_currency(text):
     """
@@ -109,7 +108,7 @@ def get_network_fee(): # with web3.py he gives 520 gwei which is too much
     page = br.open("http://gasprice.dopedapp.com/")
     response = page.json()
     gwei_price = float(response["safe_price_in_gwei"])
-    return gwei_price * GWEI_TO_ETHER * NB_GAS_FOR_TRANSACTION
+    return gwei_price
 
 
 class Wallet(object):
@@ -171,27 +170,17 @@ class Wallet(object):
 	
         web3 = Web3(HTTPProvider('https://ropsten.infura.io/YOUR_API_KEY')) 
 	"""
-
         if private_key is None:
             save_to =  os.path.expanduser("~") + "/.config/ethereum_wallet_id.cfg"
             if os.path.isfile(save_to) is False:
                 # doesn't exist
-                print("\n****************************************************")
-                print("\n\nSetting up  ETHwallet for first time use....")
-                print("\n\nCreating new Wallet For Agent...")
                 private_key = self.create_private_key()
-                print("\n\nCreated new ETHwallet with private key : " + private_key)
-                print("\n****************************************************\n")
                 with open(save_to,'w') as f:
                     f.write(private_key)
             else:
                 # exists
                 with open(save_to,'r') as f:
                     private_key = f.read()
-                    print("\n\n************************************************")
-                    print("\n\nAgent already has its own PERSONAL unique ETHwallet ")
-                    print("\n\nAgent already has an ETH wallet with privatekey: " + private_key)
-                    print("\n\n************************************************\n\n")
 	
         if eth_provider is None:
             eth_provider = self.get_infura_node()
@@ -201,9 +190,6 @@ class Wallet(object):
         raw = privtoaddr(private_key)
         self.address = checksum_encode(raw)
         assert self.web3.isAddress(self.address)
-
-    def get_address_for_receiving_eth(self):
-        return self.address
         
     def get_balance(self):
         """
@@ -214,15 +200,6 @@ class Wallet(object):
         balance_in_wei = self.web3.eth.getBalance(self.address) 
         balance = self.web3.fromWei(balance_in_wei, "ether")
         return balance
-    def get_private_key(self):
-            save_to =  os.path.expanduser("~") + "/.config/ethereum_wallet_id.cfg"
-            if os.path.isfile(save_to) is False:
-                return "No private key found"
-            else:
-                # exists
-                with open(save_to,'r') as f:
-                    private_key = f.read()
-                    return private_key
 
     def pay(self, address_to_send, amount, fee=get_network_fee(),
             number_gas=NB_GAS_FOR_TRANSACTION): 
@@ -253,11 +230,26 @@ class Wallet(object):
             return tx_hash
         else:
             print("No enough ether on your account")
+    def getTransactionStatus(self, txHash):
+        #transaction_Infos = self.web3.eth.getTransaction(txHash)
+        transaction_Receipt = self.web3.eth.getTransactionReceipt(txHash)
+        
+        if transaction_Receipt is None:
+            return "Transaction not found on the Ethereum Blockchain, maybe it is not yet mined"
+        elif transaction_Receipt['status'] is 0:
+            return "Error"
+        elif transaction_Receipt['status'] is 1:
+            return "Success"
+        
 def main():
     #test = Wallet(eth_provider=Wallet.get_infura_ropsten_node())
-    test = Wallet(eth_provider="https://ropsten.infura.io/FFxYa0JaUoDljkoTWMQG")
+    test = Wallet()
     print(str(test.get_balance()))
-    print(str(test.pay("0xB91528B9Ef4aB640C105cD4e948334E19DD90A4E",0.0001)))
+    #print(test.getTransactionStatus("0x2d8037b04efb170660820771e0f649deb55ca5ff0e3b4c36033f59d2a61456fe"))
+    #print(test.pay("0x30a5301353150B96D16f4e40562351FE18EEE423",0.000001))
+    txHash = test.pay("0x30a5301353150B96D16f4e40562351FE18EEE423",0.00001)
+    print(txHash)
+    print(test.getTransactionStatus(txHash))
 
 if __name__ == "__main__":
     main()
