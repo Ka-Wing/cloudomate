@@ -65,14 +65,16 @@ def execute(cmd=sys.argv[1:]):
     parser = ArgumentParser(description="Cloudomate")
 
     subparsers = parser.add_subparsers(dest="type")
-    add_vps_parsers(subparsers)
+
+    add_agent_status_notifier(subparsers)
+    add_captcha_manager(subparsers)
     add_vpn_parsers(subparsers)
     add_vpn_purchase(subparsers)
     add_vpn_status(subparsers)
+    add_vpn_subscription_status(subparsers)
     add_vpn_turn_on(subparsers)
     add_vpn_turn_off(subparsers)
-    add_agent_status_notifier(subparsers)
-    add_captcha_manager(subparsers)
+    add_vps_parsers(subparsers)
     add_wallet(subparsers)
     subparsers.required = True
 
@@ -83,31 +85,35 @@ def add_vpn_purchase(subparsers):
     parser_purchase = subparsers.add_parser("vpn-purchase", help="Purchase VPN")
     parser_purchase.set_defaults(func=vpn_purchase)
     parser_purchase.add_argument("provider", help="The specified provider", choices=providers['vpn'])
-    parser_purchase.add_argument("--coin", help="Choose the cryptocurrency used for purchasing.")
-    parser_purchase.add_argument("--feemultiplier", help="Choose the fee used for purchasing.")
-    parser_purchase.add_argument("--accountnr", help="Choose the cryptocurrency used for purchasing.")
-    parser_purchase.add_argument("--username", help="Choose the username.")
-    parser_purchase.add_argument("--password", help="Choose the password.")
+    parser_purchase.add_argument("-c","--coin", help="Choose the cryptocurrency used for purchasing.")
+    parser_purchase.add_argument("-fm", "--feemultiplier", help="Choose the fee used for purchasing.")
+    parser_purchase.add_argument("-a", "--accountnr", help="Choose the cryptocurrency used for purchasing.")
+    parser_purchase.add_argument("-un", "--username", help="Choose the username.")
+    parser_purchase.add_argument("-pw", "--password", help="Choose the password.")
     parser_purchase.add_argument("-r", help="Given username is already registered.", action="store_true")
     parser_purchase.add_argument("-f", help="Don't prompt for user confirmation", dest="noconfirm", action="store_true")
 
+def add_vpn_subscription_status(subparsers):
+    parser_subscription_status = subparsers.add_parser("vpn-subscription-status", help="Check status of the subscription of the VPN service")
+    parser_subscription_status.set_defaults(func=vpn_subscription_status)
+    parser_subscription_status.add_argument("provider", help="The specified provider", choices=providers['vpn'])
+
 def add_vpn_status(subparsers):
-    parser_purchase = subparsers.add_parser("vpn-status", help="Check VPN status")
-    parser_purchase.set_defaults(func=vpn_status)
-    parser_purchase.add_argument("provider", help="The specified provider", choices=providers['vpn'])
+    parser_vpn_status = subparsers.add_parser("vpn-status", help="Returns provider name of active VPN service if any.")
+    parser_vpn_status.set_defaults(func=vpn_status)
 
 def add_vpn_turn_on(subparsers):
-    parser_purchase = subparsers.add_parser("vpn-turn-on", help="Turn on specified VPN service.")
-    parser_purchase.set_defaults(func=vpn_turn_on)
-    parser_purchase.add_argument("provider", help="The specified provider", choices=providers['vpn'])
-    parser_purchase.add_argument("-c", "--country", help="The location of the server through which you would like to "
+    parser_turn_on = subparsers.add_parser("vpn-turn-on", help="Turn on specified VPN service.")
+    parser_turn_on.set_defaults(func=vpn_turn_on)
+    parser_turn_on.add_argument("provider", help="The specified provider", choices=providers['vpn'])
+    parser_turn_on.add_argument("-c", "--country", help="The location of the server through which you would like to "
                                                          "router traffic")
-    parser_purchase.add_argument("-p", "--protocol", help="The protocol.")
+    parser_turn_on.add_argument("-p", "--protocol", help="The protocol.")
 
 def add_vpn_turn_off(subparsers):
-    parser_purchase = subparsers.add_parser("vpn-turn-off", help="Turn off active VPN service.")
-    parser_purchase.set_defaults(func=vpn_turn_off)
-    parser_purchase.add_argument("provider", help="The specified provider", choices=providers['vpn'])
+    parser_turn_off = subparsers.add_parser("vpn-turn-off", help="Turn off active VPN service.")
+    parser_turn_off.set_defaults(func=vpn_turn_off)
+    parser_turn_off.add_argument("provider", help="The specified provider", choices=providers['vpn'])
 
 def add_agent_status_notifier(subparser):
     parser_captcha = subparser.add_parser("agent-status-notifier", help="Status notifier of agent.")
@@ -121,7 +127,7 @@ def add_agent_status_notifier(subparser):
     turnon_parser = subparser_captcha.add_parser("turnon", help ="Turn on the status notifier")
     turnon_parser.set_defaults(func=turnon_notifier)
     turnon_parser.add_argument("minutes", help="Amount of minutes.", type=int)
-    turnon_parser.add_arguments("recipient", help="Address where to send the email to")
+    turnon_parser.add_argument("recipient", help="Address where to send the email to")
 
     turnoff_parser = subparser_captcha.add_parser("turnoff", help="Turn off the status notifier.")
     turnoff_parser.set_defaults(func=turnoff_notifier)
@@ -287,8 +293,16 @@ def vpn_purchase(args):
     elif args.provider == "vpnac":
         vpnac_purchase_handler(args)
 
+# Checks the VPN subscription
+def vpn_subscription_status(args):
+    print(args)
+    print("vpn_subscription_status()")
+    pass
+
+# Checks whether the VPN service is turned on or off.
 def vpn_status(args):
     print(args)
+    print("vpn_status()")
     pass
 
 def vpn_turn_on(args):
