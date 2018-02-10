@@ -91,7 +91,7 @@ class InstallMullvad(object):
         country_options = soup.select('select[name=region] > option')
         # print(country_options)
         if 'value="' + country + '"' not in str(country_options):
-            print("Error: Country code incorrect, please use one of the following country codes:")
+            print("Error: Country code incorrect, please use one of the following country codes specific to Mullvad:")
             print('"" Random')
             i = 2
             while i < len(country_options) - 1:
