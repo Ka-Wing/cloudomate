@@ -34,6 +34,7 @@ from cloudomate.util.settings import Settings
 from cloudomate.wallet import Wallet as bitcoin_wallet
 
 import re
+import time
 from cloudomate import ethereum_wallet as E_wallet_util
 from cloudomate.ethereum_wallet import Wallet as EthereumWallet
 from cloudomate.hoster.vpn.vpnac_purchase import vpnacVPNPurchaser
@@ -240,9 +241,41 @@ def vpnac_purchase_handler(args):
 
     print("address: " + b['address'])
     print("amount: " + b['amount'])
-
-    print(args)
-
+    print("\n\nstarting payment process...")
+    if args.coin == 'ETH':
+        ethwallet = EthereumWallet()
+        if args.feemultiplier != None:
+            fee = int(float(args.feemultiplier))*float(E_wallet_util.get_network_fee())
+            print("\nFee being multiplied by " + args.feemultiplier + ", \ncurrent AVG fee: " + str(E_wallet_util.get_network_fee()) + "Gwei \nyour fee: " + str(fee))
+            txhash = ethwallet.pay(b['address'],b['amount'],fee)
+            print("\nYour transactionhash: " + str(txhash))
+            print("\n\nAwaiting payment conformation for current transaction hash... re-checking in 30 sec..")
+            time.sleep(30)
+            txstatus = ethwallet.getTransactionStatus(txhash)
+            while txstatus != "Success":
+                print("\n\nAwaiting payment conformation for current transaction hash... re-checking in 30 sec..")
+                time.sleep(30)
+                txstatus = ethwallet.getTransactionStatus(txhash)
+                if txstatus == "Error":
+                    print("\n\nTransaction seems to have failed...")
+                    exit(0)
+            print("\n\nTransaction has finished succesfully!...")
+            vpnac.saveLoginAfterPurchase()
+        else:
+            txhash = ethwallet.pay(b['address'],b['amount'])
+            print("\nYour transactionhash: " + str(txhash))
+            print("\n\nAwaiting payment conformation for current transaction hash... re-checking in 30 sec..")
+            time.sleep(30)
+            txstatus = ethwallet.getTransactionStatus(txhash)
+            while txstatus != "Success":
+                print("\n\nAwaiting payment conformation for current transaction hash... re-checking in 30 sec..")
+                time.sleep(30)
+                txstatus = ethwallet.getTransactionStatus(txhash)
+                if txstatus == "Error":
+                    print("\n\nTransaction seems to have failed...")
+                    exit(0)
+            print("\n\nTransaction has finished succesfully!...")
+            vpnac.saveLoginAfterPurchase()
 
 #TODO PHILIP
 def torguard_purchase_handler(args):
@@ -268,14 +301,13 @@ def torguard_purchase_handler(args):
         if use_coin == 'ETH': print("\n\nNo fee multiplier specified using ETHEREUM standard fee of: " + str(E_wallet_util.get_network_fee()))
         elif use_coin == 'BTC': print("\n\nNo fee multiplier specified using BITCOIN standard fee of: " + str(bitcoin_wallet_util.get_network_fee()))
 
-    return
     #TODO: pay with ether
     torguard = torguardVPNPurchaser()
     user_settings = {"email": args.username, "password": args.password, "registered": "0"}
     if args.r == True: user_settings["registered"] = '1'
 
     b = None
-    #vpnac.retrieve_ethereum(user_settings)
+
     if use_coin == 'BTC':
         b = torguard.retrieve_bitcoin(user_settings)
     elif use_coin == 'ETH':
@@ -284,7 +316,41 @@ def torguard_purchase_handler(args):
     print("address: " + b['address'])
     print("amount: " + b['amount'])
 
-    print(args)
+    print("\n\nstarting payment process...")
+    if args.coin == 'ETH':
+        ethwallet = EthereumWallet()
+        if args.feemultiplier != None:
+            fee = int(float(args.feemultiplier))*float(E_wallet_util.get_network_fee())
+            print("\nFee being multiplied by " + args.feemultiplier + ", \ncurrent AVG fee: " + str(E_wallet_util.get_network_fee()) + "Gwei \nyour fee: " + str(fee))
+            txhash = ethwallet.pay(b['address'],b['amount'],fee)
+            print("\nYour transactionhash: " + str(txhash)) 
+            print("\n\nAwaiting payment conformation for current transaction hash... re-checking in 30 sec..")
+            time.sleep(30)
+            txstatus = ethwallet.getTransactionStatus(txhash)
+            while txstatus != "Success":
+                print("\n\nAwaiting payment conformation for current transaction hash... re-checking in 30 sec..")
+                time.sleep(30)
+                txstatus = ethwallet.getTransactionStatus(txhash)
+                if txstatus == "Error":
+                    print("\n\nTransaction seems to have failed...")
+                    exit(0)
+            print("\n\nTransaction has finished succesfully!...")
+            torguard.saveLoginAfterPurchase()
+        else:
+            txhash = ethwallet.pay(b['address'],b['amount'])
+            print("\nYour transactionhash: " + str(txhash))
+            print("\n\nAwaiting payment conformation for current transaction hash... re-checking in 30 sec..")
+            time.sleep(30)
+            txstatus = ethwallet.getTransactionStatus(txhash)
+            while txstatus != "Success":
+                print("\n\nAwaiting payment conformation for current transaction hash... re-checking in 30 sec..")
+                time.sleep(30)
+                txstatus = ethwallet.getTransactionStatus(txhash)
+                if txstatus == "Error":
+                    print("\n\nTransaction seems to have failed...")
+                    exit(0)
+            print("\n\nTransaction has finished succesfully!...")
+            torguard.saveLoginAfterPurchase()
 
 #TODO KW DINESH
 def mullvad_purchase_handler(args):

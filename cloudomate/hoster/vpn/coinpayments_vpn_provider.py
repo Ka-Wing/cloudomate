@@ -35,6 +35,8 @@ class coinpaymentsVpnProvider(ABC):
 
     driver = None
 
+    user_used_for_payment = None
+
     #use to validate email user-setting
     def isValidEmail(self, email):
         if re.match("(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email) == None:
@@ -241,6 +243,7 @@ class coinpaymentsVpnProvider(ABC):
                     address = match[0][0]
                     amount = match[0][1]
 
+        self.user_used_for_payment = user_settings
         time.sleep(2)
         return {'amount': str(amount), 'address': str(address)}
 
@@ -264,8 +267,10 @@ class coinpaymentsVpnProvider(ABC):
         else:
             print(" Not enough " + str(coin_type))
 
-    def saveLoginAfterPurchase(self, username, password):
+    def saveLoginAfterPurchase(self):
 
+        username = self.user_used_for_payment['email']
+        password = self.user_used_for_payment['password']
         # save the login parameter so these can be used by the VPN instalaton script in the Utilities
         full_file_path = self.saveUserLoginFile
         file_contents = username + "\n" + password
