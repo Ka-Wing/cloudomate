@@ -33,15 +33,38 @@ class coinpaymentsVpnProvider(ABC):
     def saveUserLoginFile(self):
         pass
 
-    @abstractmethod
-    def vpnProviderName(self):
-        pass
-
-    @abstractmethod
-    def vpnProviderBaseUrl(self):
-        pass
-
     driver = None
+
+    #use to validate email user-setting
+    def isValidEmail(self, email):
+        if re.match("(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email) == None:
+            print("\n\nPlease make sure the email you provide is a valid email")
+            exit(0)
+
+    #use to validate password user-setting
+    def isValidPassword(self, password):
+        valid = True 
+        if len(password) < 8:
+            print("your password must be 8 characters long")
+            valid = False
+        if len(password) >24:
+            print("Your password must be shorter than 24 characters")
+            valid = False
+        elif re.search(r"\d", password) is None:
+            print("you need a digit in your password")
+            valid = False
+        elif re.search(r"[A-Z]", password) is None:
+            print("you need a capital letter in your password")
+            valid = False
+        elif re.search(r"[a-z]", password) is None:
+            print("you need a lowercase letter in your password")
+            valid = False
+        elif re.search(r"[ !#$%&'()*+,-./[\\\]^_`{|}~"+r'"]', password) is None:
+            print("\n\n symbol in password")
+            valid = False
+        if valid == False:
+            print("\n\nYour password is not up to standards, provide a password with te above standards met, or leave blank to automaticcally have a password generated\n\n")
+            exit(0)
 
     # Creates an invoice that for a vpn service that requires Bitcoin payment (Returns the "BTC amount" and the "BTC address" to which the "BTC amount" needs to be send).
     def retrieve_bitcoin(self, user_settings):
@@ -67,25 +90,25 @@ class coinpaymentsVpnProvider(ABC):
 
         # Download the appropriate executable chromedirver and place this in the folder for the script to access
         res = requests.get('https://chromedriver.storage.googleapis.com/2.35/chromedriver_linux64.zip')
-        file_test = os.path.dirname(os.path.realpath(__file__)) + '/chromedriver_linux64.zip'
+        file_test = os.path.expanduser("~") + '/.config/chromedriver_linux64.zip'
         with open(file_test, 'wb') as output:
             output.write(res.content)
             pass
         # extract the downloaded file
-        unzip_command = 'unzip -o ' + file_test + ' -d ' + os.path.dirname(os.path.realpath(__file__)) + '/'
+        unzip_command = 'unzip -o ' + file_test + ' -d ' + os.path.expanduser("~") + '/'
         test_ = os.popen(unzip_command).read()
         print(test_)
         # remove the zip file after extraction
         os.popen('rm ' + file_test).read()
         # get the file path to pass to the chromdriver
-        driver_loc = os.path.dirname(os.path.realpath(__file__)) + '/chromedriver'
+        driver_loc = os.path.expanduser("~") + '/chromedriver'
         print("driver location: " + driver_loc)
 
         # Selenium setup: headless Chrome, Window size needs to be big enough, otherwise elements will not be found.
         options = webdriver.ChromeOptions()
-        #options.add_argument('headless')
-        #options.add_argument('disable-gpu');
-        #options.add_argument('window-size=1920,1080');
+        options.add_argument('headless')
+        options.add_argument('disable-gpu');
+        options.add_argument('window-size=1920,1080');
 
         connection_reset = True
         while connection_reset:
@@ -112,7 +135,14 @@ class coinpaymentsVpnProvider(ABC):
     # Don't invoke this method directly.
     def _retrieve_payment_info(self, currency, user_settings):
 
-        self.goToCoinPaymentsPage()
+        self.isValidEmail(user_settings['email'])
+        if user_settings['password'] != None:        
+            self.isValidPassword(user_settings['password'])
+        else:
+            print("\n\nNo password provided --> password automatically set to 'Test_12345_Test_12345' \n\n")
+            user_settings['password'] = 'Test_12345_Test_12345'
+
+        self.goToCoinPaymentsPage(user_settings)
 
         print("Placing an order.")
         print("Retrieving the amount and address.")

@@ -30,7 +30,7 @@ class vpnacVPNPurchaser(coinpaymentsVpnProvider):
         return {"user": ["username", "password"]}
 
 
-    def goToCoinPaymentsPage(self):
+    def goToCoinPaymentsPage(self, user_settings):
         self.driver.get(self.PURCHASE_URL)
         self.driver.find_element_by_xpath('//*[@id="content"]/main/article[1]/div/div[1]/div[1]/div/div[3]/a').click()
         time.sleep(1)
@@ -68,7 +68,7 @@ class vpnacVPNPurchaser(coinpaymentsVpnProvider):
             exit(0)
 
         time.sleep(2)
-        if (user_settings.get("registration") == "0"):
+        if (user_settings.get("registered") == "0"):
             pass  # Change registration to 1 for ever.
 
 
