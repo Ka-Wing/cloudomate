@@ -90,7 +90,7 @@ class MullVad(VpnHoster):
         # Add the remaining days to the current date to get expiration date
         return VpnStatus(online, now + expiration)
 
-    def purchase(self, wallet):
+    def purchase(self, wallet, option="None", fee_multiplier=1):
         #Check if account exists, else create new one
         if self._settings.has_key("Mullvad", "accountnumber"):
             self._login()
@@ -99,7 +99,9 @@ class MullVad(VpnHoster):
         # Prepare for the purchase on the MullVad website
         page = self._order()
 
-        self.pay(wallet, self.get_gateway(), str(page))
+        transaction_hash = self.pay(wallet, self.get_gateway(),
+                                  str(page), fee_multiplier)
+        print(transaction_hash)
 
     '''
     Hoster-specific methods that are needed to perform the actions

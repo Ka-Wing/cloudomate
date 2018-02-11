@@ -118,6 +118,19 @@ if len(options_) > 1:
         print("\ninstalling chromedriver....\n")
         test_ = os.popen('apt-get install -y chromium-chromedriver').read()
         if q_mode == False : print(test_)
+
+        #Installing electrum dependencies
+        print("\ninstalling setuptools for python3....\n")
+        test_ = os.popen('apt-get install -y python3-setuptools').read()
+        if q_mode == False: print(test_)
+        #
+        print("\ninstalling pyqt5 for python3....\n")
+        test_ = os.popen('apt-get install -y python3-pyqt5').read()
+        if q_mode == False: print(test_)
+        #Installing electrum bitcoin wallet
+        print("\ninstalling electrum for python3....\n")
+        test_ = os.popen('pip3 install https://download.electrum.org/3.0.6/Electrum-3.0.6.tar.gz').read()
+        if q_mode == False: print(test_)
         pass
 
 from codecs import open

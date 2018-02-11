@@ -365,8 +365,15 @@ def mullvad_purchase_handler(args):
         wallet = bitcoin_wallet(wallet_path=settings.get('client', 'walletpath'))
     else:
         wallet = bitcoin_wallet()
-
-    m.purchase(wallet)
+    try:
+        if args.feemultiplier == None:
+            print("\n\nNo fee multiplier specified using BITCOIN standard fee of: " + str(bitcoin_wallet_util.get_network_fee()))
+            m.purchase(wallet)
+        else:
+            m.purchase(wallet, fee_multiplier=args.feemultiplier)
+    except Exception as e:
+        print("Error: Wallet file not found.")
+        print("Type 'electrum create' to create a new wallet, or provide a path to a wallet with the -w option")
 
 def add_wallet(subparsers):
     wallet_parsers = subparsers.add_parser("wallet")
@@ -406,31 +413,80 @@ def add_parser_wallet_getbalance(subparsers):
     pass
 
 def add_parser_wallet_getaddress(subparsers):
-    parser_getbalance = subparsers.add_parser("getaddress", help="Get address of wallet.")
-    parser_getbalance.set_defaults(type="command", func=wallet_getaddress)
+    parser_getaddress = subparsers.add_parser("getaddress", help="Get "
+                                                           "address of wallet.")
+    parser_getaddress.set_defaults(type="command",
+                                  func=wallet_getaddress)
     pass
 
 def add_parser_wallet_getprivatekey(subparsers):
-    parser_getbalance = subparsers.add_parser("getprivatekey", help="Get private key of wallet.")
-    parser_getbalance.set_defaults(type="command", func=wallet_getprivatekey)
+    parser_getprivatekey = subparsers.add_parser("getprivatekey",
+                                             help="Get private key of wallet.")
+    parser_getprivatekey.set_defaults(type="command", func=wallet_getprivatekey)
     pass
 
 def add_parser_wallet_getfees(subparsers):
-    parser_getbalance = subparsers.add_parser("getfees", help="Get fees of wallet.")
-    parser_getbalance.set_defaults(type="command", func=wallet_fees)
+    parser_getfees = subparsers.add_parser(
+        "getfees", help="Get fees of wallet.")
+    parser_getfees.set_defaults(type="command", func=wallet_fees)
     pass
+
+#Get (un)confirmed bitcoin wallet balance
+def wallet_getbalance_bitcoin():
+    settings = Settings()
+    if settings.has_key('client', 'walletpath'):
+        wallet = bitcoin_wallet(wallet_path=settings.get('client', 'walletpath'))
+    else:
+        wallet = bitcoin_wallet()
+    try:
+        print("\n\nBitcoin Balance Confirmed: \n" + str(wallet.get_balance_confirmed()))
+        print("\n\nBitcoin Balance Unconfirmed: \n" + str(wallet.get_balance_unconfirmed()))
+    except Exception as e:
+        print("Error: Wallet file not found.")
+        print("Type 'electrum create' to create a new wallet, or provide a path to a wallet with the -w option")
+
+#Get bitcoin wallet addresses
+def wallet_getaddress_bitcoin():
+    settings = Settings()
+    if settings.has_key('client', 'walletpath'):
+        wallet = bitcoin_wallet(wallet_path=settings.get('client', 'walletpath'))
+    else:
+        wallet = bitcoin_wallet()
+    try:
+        print("\n\nBitcoin Addresses: \n" + str(wallet.get_addresses()))
+    except Exception as e:
+        print("Error: Wallet file not found.")
+        print("Type 'electrum create' to create a new wallet, or provide a path to a wallet with the -w option")
+
+#Get bitcoin wallet fees
+def wallet_getfees_bitcoin():
+    settings = Settings()
+    if settings.has_key('client', 'walletpath'):
+        wallet = bitcoin_wallet(wallet_path=settings.get('client', 'walletpath'))
+    else:
+        wallet = bitcoin_wallet()
+    try:
+        print("\n\nBitcoin Fees: \n" + str(bitcoin_wallet_util.get_network_fee()))
+    except Exception as e:
+        print("Error: Wallet file not found.")
+        print("Type 'electrum create' to create a new wallet, or provide a path to a wallet with the -w option")
+
 
 #TODO PHILIP
 def wallet_getbalance(args):
     if args.wallet_type == "ethereum":
         ethwallet = EthereumWallet()
         print("\n\nEthereum Balance: \n" + str(ethwallet.get_balance()))
+    elif args.wallet_type == "bitcoin":
+        wallet_getbalance_bitcoin()
 
 #TODO PHILIP
 def wallet_getaddress(args):
     if args.wallet_type == "ethereum":
         ethwallet = EthereumWallet()
         print("\n\nEthereum Address: \n" + str(ethwallet.get_address()))
+    elif args.wallet_type == "bitcoin":
+        wallet_getaddress_bitcoin()
 
 #TODO PHILIP
 def wallet_getprivatekey(args):
@@ -442,6 +498,8 @@ def wallet_getprivatekey(args):
 def wallet_fees(args):
     if args.wallet_type == "ethereum":
         print("\n\nEthereum AVG Fee: \n" + str(E_wallet_util.get_network_fee()) + " Gwei")
+    elif args.wallet_type == "bitcoin":
+        wallet_getfees_bitcoin()
 
 def vpn_purchase(args):
     if args.provider == "torguard":

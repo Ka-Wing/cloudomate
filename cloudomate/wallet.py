@@ -93,7 +93,7 @@ def _get_network_cost(speed):
     return satoshirate
 
 
-def get_network_fee(speed='halfHourFee'):
+def get_network_fee(speed='fastestFee'):
     """
     Give an estimate of network fee for the average bitcoin transaction for given speed.
     Supported speeds are available at https://bitcoinfees.21.co/api/v1/fees/recommended
