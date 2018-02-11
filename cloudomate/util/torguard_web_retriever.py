@@ -124,9 +124,9 @@ class torguardServiceRetriever():
         driver_loc = os.path.expanduser("~") + '/chromedriver'
 
         options = webdriver.ChromeOptions()
-        options.add_argument('headless')
-        options.add_argument('disable-gpu')
-        options.add_argument('window-size=1920,1080')
+        #options.add_argument('headless')
+        #options.add_argument('disable-gpu')
+        #options.add_argument('window-size=1920,1080')
         #TODO fix hardcoded executable_path
         self.driver = webdriver.Chrome(executable_path=driver_loc,
                                        chrome_options=options)
@@ -151,38 +151,30 @@ class torguardServiceRetriever():
         service_index = 1
         while True:
             try:
-                # If this element is found, it means there is only one service.
-                element = self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/div[4]/table/tbody/tr[" +
-                                                            str(service_index) + "]/td[5]/span")
+                element = self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/div[4]/table/tbody/tr[1]/td[5]")
+                print("Found.")
 
-                if element.text == "Active":
+                # If this element is found, it means there is only one service.
+                element = str(self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/div[4]/table/tbody/tr["
+                                                            + str(service_index) + "]/td[5]/span").text)
+
+                print(element)
+
+                if element == "Active":
+                    print("Active")
                     self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/div[4]/table/tbody/tr[" +
                                                       str(service_index) + "]/td[6]/div/a").click()
                     self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/div[4]/table/tbody/tr[" +
                                                       str(service_index) + "]/td[6]/div/ul/li[3]/a").click()
 
-                    return True
+                    break
+                print("After if")
                 service_index = service_index + 1
             except NoSuchElementException:
-                return False  # Could not find an active service
+                print("No active VPN service found.")
+                sys.exit(0)  # Could not find an active service
 
-            time.sleep(3)
-
-            a = self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/table/tbody/tr/td[4]")
-            a.find_element_by_class_name("btn").click()
-
-
-            self.driver.switch_to.alert().accept()
-            self.driver.find_element_by_xpath()
-
-            tries = 0
-            while tries < 5:
-                time.sleep(2)
-                try:
-                    self.driver.find_element_by_xpath("/html/body/div[2]/div[2]/div/table/tbody/tr/td[4]/div")
-                except NoSuchElementException:
-                    tries = tries + 1
-
+        time.sleep(3)
 
     #Returns if logged in
     def _get_logged_in(self):
