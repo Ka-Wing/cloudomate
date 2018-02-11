@@ -1,17 +1,19 @@
+import os
 import time
 import re
 import sys
 from selenium import webdriver
 from cloudomate.util.recaptchasolver import reCaptchaSolver
 from selenium.common.exceptions import NoSuchElementException
+import requests
 
-class anticaptcha:
+class anticaptchaReloader:
 
     loginlink = "https://anti-captcha.com/clients/entrance/login"
     username = ""
     password = ""
 
-    def __init(self, login_username, login_password):
+    def __init__(self, login_username, login_password):
         self.username = login_username
         self.password = login_password
 
@@ -180,7 +182,3 @@ class anticaptcha:
         amount = re.findall("send (.*?)" + currency[1] + " to", instructions.text)[0]
 
         return {'amount' : str(amount), 'address' : str(address)}
-
-if __name__ == "__main__":
-    a = anticaptcha()
-    a.purchase_bitcoin()

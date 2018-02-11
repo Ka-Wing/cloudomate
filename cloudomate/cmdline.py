@@ -43,7 +43,7 @@ from cloudomate.util.installvpn_torguard import installVpnTorguard
 from cloudomate.util.installvpn_vpnac import installVpnAC
 from cloudomate.util.vpn_status_monitor import VpnStatusMonitor
 from cloudomate.util.captcha_account_manager import captchaAccountManager
-
+from cloudomate.util.agent_notification_manager import AgentNotificationManager
 
 standard_library.install_aliases()
 
@@ -166,19 +166,21 @@ def add_captcha_manager(subparser):
 #PHILIP
 def turnon_notifier(args):
     print("turnon_notifier()")
-    print(args)
-    print(args.minutes)
-    print(type(args.minutes))
+    agent_status_notifier = AgentNotificationManager()
+    agent_status_notifier.doNotifyEveryXMinutes(everyXminute=args.minutes, mailTo=args.recipient)
 
 #PHILIP
 def turnoff_notifier(args):
-    print("turnoff_notifier()")
-    print(args)
+    agent_status_notifier = AgentNotificationManager()
+    agent_status_notifier.turnOffAutoNotify()
 
 #PHILIP
 def notifier_status(args):
-    print("notifier_status()")
-    print(args)
+    agent_status_notifier = AgentNotificationManager()
+    if agent_status_notifier.autoNotifyIsOn() == True:
+        print("active")
+    else:
+        print("not active")
 
 #PHILIP
 def captcha_get_balance(args):
@@ -189,10 +191,9 @@ def captcha_get_balance(args):
 def captcha_reload(args):
     if not args.amount > 0:
         print("Amount must be at least $1")
-        return
-
+        exit(0)
     c_Manager = captchaAccountManager()
-    c_Manager.reload_account()
+    c_Manager.reload_account(args.amount)
 
 #PHILIP
 def captcha_view_account(args):
@@ -201,11 +202,6 @@ def captcha_view_account(args):
     print("\n\nUsername: " + user_login['username'])
     print("Password: " + user_login['password'])
     print("Current API KeY: " + c_Manager.get_api_key() + "\n\n")
-
-#PHILIP
-def captcha_manager(args):
-    print("captcha_manager()")
-    print(args)
 
 #TODO PHILIP
 def vpnac_purchase_handler(args):

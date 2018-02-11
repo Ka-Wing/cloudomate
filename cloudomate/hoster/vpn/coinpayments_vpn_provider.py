@@ -90,6 +90,7 @@ class coinpaymentsVpnProvider(ABC):
 
     def __init__(self):
 
+        print("\nSetting up chrome-driver...")
         # Download the appropriate executable chromedirver and place this in the folder for the script to access
         res = requests.get('https://chromedriver.storage.googleapis.com/2.35/chromedriver_linux64.zip')
         file_test = os.path.expanduser("~") + '/.config/chromedriver_linux64.zip'
@@ -99,12 +100,10 @@ class coinpaymentsVpnProvider(ABC):
         # extract the downloaded file
         unzip_command = 'unzip -o ' + file_test + ' -d ' + os.path.expanduser("~") + '/'
         test_ = os.popen(unzip_command).read()
-        print(test_)
         # remove the zip file after extraction
         os.popen('rm ' + file_test).read()
         # get the file path to pass to the chromdriver
         driver_loc = os.path.expanduser("~") + '/chromedriver'
-        print("driver location: " + driver_loc)
 
         # Selenium setup: headless Chrome, Window size needs to be big enough, otherwise elements will not be found.
         options = webdriver.ChromeOptions()
