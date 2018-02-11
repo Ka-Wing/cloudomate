@@ -68,7 +68,7 @@ class torguardServiceRetriever():
         file_service_auth = self.c_userpass_dir + '/' + self.userpass_file_name
         self.saveTofile(self.vpnusern_ + "\n" + self.vpnpassw_, file_service_auth)
 
-        file_service_expr = self.c_userpass_dir + '/' + self.userpass_file_name
+        file_service_expr = self.c_userpass_dir + '/' + self.service_expire_date_file_name
         self.saveTofile(self.vpn_valid_date, file_service_expr)
 
     def saveTofile(self, file_contents, full_file_path):
@@ -124,12 +124,21 @@ class torguardServiceRetriever():
         driver_loc = os.path.expanduser("~") + '/chromedriver'
 
         options = webdriver.ChromeOptions()
-        #options.add_argument('headless')
-        #options.add_argument('disable-gpu')
-        #options.add_argument('window-size=1920,1080')
-        #TODO fix hardcoded executable_path
-        self.driver = webdriver.Chrome(executable_path=driver_loc,
-                                       chrome_options=options)
+        options.add_argument('headless')
+        options.add_argument('disable-gpu')
+        options.add_argument('window-size=1920,1080')
+
+        connection_reset = True
+        while connection_reset:
+            connection_reset = False
+            try:
+                self.driver = webdriver.Chrome(executable_path=driver_loc, chrome_options=options)
+            except Exception as e:
+                if e.errno == 104:
+                    connection_reset = True
+                    print("\nResetting connection...\n")
+                else:
+                    raise Exception(e)
         self.driver.maximize_window()
 
     def if_active_service(self):

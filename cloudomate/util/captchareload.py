@@ -82,8 +82,24 @@ class anticaptchaReloader:
         options = webdriver.ChromeOptions()
         options.add_argument('headless')
         options.add_argument('disable-gpu');
-        options.add_argument('window-size=1920,1080');
-        driver = webdriver.Chrome(executable_path=driver_loc, chrome_options=options)
+        options.add_argument('window-size=1920,1080')
+        driver = None
+
+        connection_reset = True
+        while connection_reset:
+            connection_reset = False
+            try:
+                driver = webdriver.Chrome(executable_path=driver_loc, chrome_options=options)
+                pass
+            except Exception as e:
+                if e.errno == 104:
+                    connection_reset = True
+                    print("\nResetting connection...\n")
+                    pass
+                else:
+                    raise Exception(e)
+            pass
+
         driver.maximize_window()
 
         # Logs in
