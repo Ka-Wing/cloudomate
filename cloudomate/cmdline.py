@@ -43,7 +43,7 @@ from cloudomate.util.installvpn_torguard import installVpnTorguard
 from cloudomate.util.installvpn_vpnac import installVpnAC
 from cloudomate.util.vpn_status_monitor import VpnStatusMonitor
 from cloudomate.util.captcha_account_manager import captchaAccountManager
-
+from cloudomate.util.agent_notification_manager import AgentNotificationManager
 
 standard_library.install_aliases()
 
@@ -166,19 +166,21 @@ def add_captcha_manager(subparser):
 #PHILIP
 def turnon_notifier(args):
     print("turnon_notifier()")
-    print(args)
-    print(args.minutes)
-    print(type(args.minutes))
+    agent_status_notifier = AgentNotificationManager()
+    agent_status_notifier.doNotifyEveryXMinutes(everyXminute=args.minutes, mailTo=args.recipient)
 
 #PHILIP
 def turnoff_notifier(args):
-    print("turnoff_notifier()")
-    print(args)
+    agent_status_notifier = AgentNotificationManager()
+    agent_status_notifier.turnOffAutoNotify()
 
 #PHILIP
 def notifier_status(args):
-    print("notifier_status()")
-    print(args)
+    agent_status_notifier = AgentNotificationManager()
+    if agent_status_notifier.autoNotifyIsOn() == True:
+        print("active")
+    else:
+        print("not active")
 
 #PHILIP
 def captcha_get_balance(args):
