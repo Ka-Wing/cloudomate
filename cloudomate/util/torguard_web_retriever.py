@@ -8,7 +8,7 @@ from selenium import webdriver
 import time
 
 from selenium.common.exceptions import NoSuchElementException
-
+import requests
 
 class torguardServiceRetriever():
 
@@ -110,12 +110,26 @@ class torguardServiceRetriever():
 
 
     def _driver_setup(self):
+        # Download the appropriate executable chromedirver and place this in the folder for the script to access
+        res = requests.get('https://chromedriver.storage.googleapis.com/2.35/chromedriver_linux64.zip')
+        file_test = os.path.expanduser("~") + '/.config/chromedriver_linux64.zip'
+        with open(file_test, 'wb') as output:
+            output.write(res.content)
+            pass
+        # extract the downloaded file
+        unzip_command = 'unzip -o ' + file_test + ' -d ' + os.path.expanduser("~") + '/'
+        test_ = os.popen(unzip_command).read()
+        # remove the zip file after extraction
+        os.popen('rm ' + file_test).read()
+        # get the file path to pass to the chromdriver
+        driver_loc = os.path.expanduser("~") + '/chromedriver')
+
         options = webdriver.ChromeOptions()
         options.add_argument('headless')
         options.add_argument('disable-gpu')
         options.add_argument('window-size=1920,1080')
         #TODO fix hardcoded executable_path
-        self.driver = webdriver.Chrome(executable_path="/home/kw/chromedriver_linux64/chromedriver",
+        self.driver = webdriver.Chrome(executable_path=driver_loc,
                                        chrome_options=options)
         self.driver.maximize_window()
 

@@ -11,6 +11,10 @@ class anticaptcha:
     username = ""
     password = ""
 
+    def __init(self, login_username, login_password):
+        self.username = login_username
+        self.password = login_password
+
     # Use this method for purchasing with Bitcoin.
     def purchase_bitcoin(self, amount=10):
         try:
@@ -57,12 +61,27 @@ class anticaptcha:
     # Returns the address of the given currency.
     def _return_address(self, currency, amount=10):
         # Selenium setup: headless Chrome, Window size needs to be big enough, otherwise elements will not be found.
+
+        # Download the appropriate executable chromedirver and place this in the folder for the script to access
+        print("\nsetting up chrome-driver...")
+        res = requests.get('https://chromedriver.storage.googleapis.com/2.35/chromedriver_linux64.zip')
+        file_test = os.path.expanduser("~") + '/.config/chromedriver_linux64.zip'
+        with open(file_test, 'wb') as output:
+            output.write(res.content)
+            pass
+        # extract the downloaded file
+        unzip_command = 'unzip -o ' + file_test + ' -d ' + os.path.expanduser("~") + '/'
+        test_ = os.popen(unzip_command).read()
+        # remove the zip file after extraction
+        os.popen('rm ' + file_test).read()
+        # get the file path to pass to the chromdriver
+        driver_loc = os.path.expanduser("~") + '/chromedriver'
+
         options = webdriver.ChromeOptions()
-        #options.add_argument('headless')
-        #options.add_argument('disable-gpu');
-        #options.add_argument('window-size=1920,1080');
-        #TODO Executable path needs fix.
-        driver = webdriver.Chrome(executable_path="/home/kw/a/chromedriver", chrome_options=options)
+        options.add_argument('headless')
+        options.add_argument('disable-gpu');
+        options.add_argument('window-size=1920,1080');
+        driver = webdriver.Chrome(executable_path=driver_loc, chrome_options=options)
         driver.maximize_window()
 
         # Logs in
