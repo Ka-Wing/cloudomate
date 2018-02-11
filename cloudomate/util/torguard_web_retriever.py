@@ -52,7 +52,7 @@ class torguardServiceRetriever():
         else:
             print("NO Weblogin credentials (not the same as openvpn service credentials) were provided: please run purchase torguard script, "
                             "or provide them directly as parameters to this script")
-            #exit(0)
+            sys.exit(0)
 
     def extractOpenVpnUserInfo(self,login_username,login_password):
         print("Retrieving username and password.")
