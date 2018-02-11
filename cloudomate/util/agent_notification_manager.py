@@ -30,7 +30,7 @@ class AgentNotificationManager:
         # sendfrom == my email address
         # sendto == recipient's email address
         sendfrom = "agentNotifier@bot.com"
-        sendto = "pblank1234567.com"
+        sendto = "pblank1234567@gmail.com"
 
         if from_email != None:
             sendfrom = from_email
