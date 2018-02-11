@@ -156,7 +156,7 @@ def add_captcha_manager(subparser):
     get_balance_parser.set_defaults(func=captcha_get_balance)
 
     reload_parser = subparser_captcha.add_parser("reload", help="Top up balance for anticaptcha account.")
-    reload_parser.add_argument("amount", help="The amount to top up.")
+    reload_parser.add_argument("amount", help="The amount to top up in US Dollars.", type=int)
     reload_parser.add_argument("-c", "--coin", help="The cryptocurrency to pay with.", default="btc")
     reload_parser.add_argument("-fm", "--feemultiplier", help="Choose the fee used for purchasing.")
     reload_parser.set_defaults(func=captcha_reload)
@@ -186,6 +186,10 @@ def captcha_get_balance(args):
 
 #PHILIP
 def captcha_reload(args):
+    if not args.amount > 0:
+        print("Amount must be at least $1")
+        return
+
     c_Manager = captchaAccountManager()
     c_Manager.reload_account()
 
