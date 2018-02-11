@@ -95,7 +95,7 @@ def execute(cmd=sys.argv[1:]):
 def add_vpn_purchase(subparsers):
     parser_purchase = subparsers.add_parser("vpn-purchase", help="Purchase VPN")
     parser_purchase.set_defaults(func=vpn_purchase)
-    parser_purchase.add_argument("provider", help="The specified provider", choices=providers['vpn'])
+    parser_purchase.add_argument("--provider", help="The specified provider", choices=providers['vpn'])
     parser_purchase.add_argument("-c","--coin", help="Choose the cryptocurrency used for purchasing.")
     parser_purchase.add_argument("-fm", "--feemultiplier", help="Choose the fee used for purchasing.")
     parser_purchase.add_argument("-a", "--accountnr", help="Choose the cryptocurrency used for purchasing.")
