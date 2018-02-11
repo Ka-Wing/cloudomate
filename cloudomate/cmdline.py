@@ -44,6 +44,7 @@ from cloudomate.util.installvpn_vpnac import installVpnAC
 from cloudomate.util.vpn_status_monitor import VpnStatusMonitor
 from cloudomate.util.captcha_account_manager import captchaAccountManager
 
+
 standard_library.install_aliases()
 
 
@@ -121,9 +122,9 @@ def add_vpn_turn_on(subparsers):
     parser_turn_on.add_argument("-p", "--protocol", help="The protocol.")
 
 def add_vpn_turn_off(subparsers):
-    parser_turn_off = subparsers.add_parser("vpn-turn-off", help="Turn off active VPN service.")
+    parser_turn_off = subparsers.add_parser("vpn-turn-off", help="Turn off active VPN services.")
     parser_turn_off.set_defaults(func=vpn_turn_off)
-    parser_turn_off.add_argument("provider", help="The specified provider", choices=providers['vpn'])
+    #parser_turn_off.add_argument("provider", help="The specified provider", choices=providers['vpn'])
 
 def add_agent_status_notifier(subparser):
     parser_captcha = subparser.add_parser("agent-status-notifier", help="Status notifier of agent.")
@@ -506,21 +507,33 @@ def vpn_subscription_status(args):
         vpn_status_torguard(args)
     elif args.provider == 'vpnac':
         vpn_status_vpnac(args)
+    elif args.provider == 'mullvad':
+        vpn_subscription_status_mullvad()
     elif args.provider == 'all':
         vpn_status_all(args)
     pass
 
+#Get the expiration date of mullvad
+def vpn_subscription_status_mullvad():
+    m = MullVad()
+    print(m.get_status())
+
 # Checks whether the VPN service is turned on or off.
 def vpn_status(args):
-    print(args)
-    print("vpn_status()")
+    if args.provider == "mullvad":
+        vpn_status_mullvad()
     pass
+
+#Get the expiration date of mullvad
+def vpn_status_mullvad():
+    m = InstallMullvad()
+    m.check_vpn()
 
 def vpn_turn_on(args):
     if args.provider == "torguard":
         torguard_turn_on_handler(args)
     elif args.provider == "mullvad":
-        mullvad_turn_on_handler(args)
+        turn_on_handler_mullvad(args)
     elif args.provider == "azirevpn":
         pass
     elif args.provider == "vpnac":
@@ -556,7 +569,8 @@ def torguard_turn_on_handler(args):
         exit(0)
 
 #TODO KW DINESH
-def mullvad_turn_on_handler(args):
+#Install and turn on mullvad vpn
+def turn_on_handler_mullvad(args):
     m = InstallMullvad()
 
     if args.country is not None:
@@ -592,28 +606,11 @@ def vpnac_turn_on_handler(args):
         print("\n" + '"' + args.country + '"' + " invalid option. Use 'list' to list options")
         exit(0)
 
-def vpn_turn_off(args):
-    if args.provider == "torguard":
-        torguard_turn_off_handler(args)
-    elif args.provider == "mullvad":
-        mullvad_turn_off_handler()
-    elif args.provider == "azirevpn":
-        pass
-    elif args.provider == "vpnac":
-        vpnac_turn_off_handler(args)
-
-#TODO PHILIP
-def torguard_turn_off_handler(args):
-    pass
-
-#TODO KW DINESH
-def mullvad_turn_off_handler():
-    #Kills all active openvpn connections
+def vpn_turn_off():
+    # Kills all active openvpn connections
     result = os.popen("sudo killall openvpn").read()
-
-#TODO PHILIP
-def vpnac_turn_off_handler(args):
-    pass
+    print(result)
+    print("All VPNs are turned off.")
 
 
 def add_vpn_parsers(subparsers):

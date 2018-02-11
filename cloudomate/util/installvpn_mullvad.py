@@ -31,7 +31,7 @@ class InstallMullvad(object):
         self._settings = Settings()
         self._settings.read_settings()
 
-    def _check_vpn(self):
+    def check_vpn(self):
         # Check if VPN is active
         page = self._browser.open(self.TESTING_URL).text
         for line in page.splitlines():
@@ -72,7 +72,7 @@ class InstallMullvad(object):
         # mean time
         print("sleep")
         time.sleep(30)
-        self._check_vpn()
+        self.check_vpn()
 
     # Download configuration files for setting up VPN and extract them
     def _download_files(self, country):
@@ -142,4 +142,4 @@ if __name__ == '__main__':
     mullvad._settings.put("Mullvad", "accountnumber", "6798499523758101")
     mullvad._settings.save_settings()
     mullvad.setup_vpn("de")
-    #mullvad._check_vpn()
+    #mullvad.check_vpn()
