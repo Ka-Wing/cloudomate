@@ -13,8 +13,8 @@ import requests
 class torguardServiceRetriever():
 
     c_userpass_dir =  os.path.expanduser("~") + '/.config/torguard_open_vpn_userpass'
-
     userpass_file_name = 'torguard_openvpn_service_auth.txt'
+    service_expire_date_file_name = 'expiration_date_openvpn_service_auth.txt'
 
     #username en passw for open vpn: NOTE these are NOT THE SAME as vpnac-web login credentials
     vpnusern_ = None
@@ -64,16 +64,17 @@ class torguardServiceRetriever():
         print(self.vpnusern_ + ", " + self.vpnpassw_)
         if os.path.isdir(self.c_userpass_dir) == False:
             os.popen('mkdir ' + self.c_userpass_dir).read()
-            pass
-        file_test = self.c_userpass_dir + '/' + self.userpass_file_name
-       # self.saveTofile(self.vpnusern_ + "\n" + self.vpnpassw_,file_test)
-        pass
+
+        file_service_auth = self.c_userpass_dir + '/' + self.userpass_file_name
+        self.saveTofile(self.vpnusern_ + "\n" + self.vpnpassw_, file_service_auth)
+
+        file_service_expr = self.c_userpass_dir + '/' + self.userpass_file_name
+        self.saveTofile(self.vpn_valid_date, file_service_expr)
 
     def saveTofile(self, file_contents, full_file_path):
         tempfile = open(full_file_path, 'w')
         tempfile.write(file_contents)
         tempfile.close()
-        pass
 
     def _login(self, login_username, login_password):
         if self.driver is None:
@@ -93,7 +94,6 @@ class torguardServiceRetriever():
                 break
             except NoSuchElementException:
                 tries = tries + 1
-                pass
 
         # Fills in form and logs in.
         self.driver.find_element_by_id("username").send_keys(login_username)
@@ -115,14 +115,13 @@ class torguardServiceRetriever():
         file_test = os.path.expanduser("~") + '/.config/chromedriver_linux64.zip'
         with open(file_test, 'wb') as output:
             output.write(res.content)
-            pass
         # extract the downloaded file
         unzip_command = 'unzip -o ' + file_test + ' -d ' + os.path.expanduser("~") + '/'
         test_ = os.popen(unzip_command).read()
         # remove the zip file after extraction
         os.popen('rm ' + file_test).read()
         # get the file path to pass to the chromdriver
-        driver_loc = os.path.expanduser("~") + '/chromedriver')
+        driver_loc = os.path.expanduser("~") + '/chromedriver'
 
         options = webdriver.ChromeOptions()
         options.add_argument('headless')
