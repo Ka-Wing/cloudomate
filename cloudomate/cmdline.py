@@ -107,7 +107,7 @@ def add_vpn_purchase(subparsers):
 def add_vpn_subscription_status(subparsers):
     parser_subscription_status = subparsers.add_parser("vpn-subscription-status", help="Check status of the subscription of the VPN service")
     parser_subscription_status.set_defaults(func=vpn_subscription_status)
-    parser_subscription_status.add_argument("provider", help="The specified provider", choices=providers['vpn'])
+    parser_subscription_status.add_argument("--provider", help="The specified provider", choices=providers['vpn'])
 
 def add_vpn_status(subparsers):
     parser_vpn_status = subparsers.add_parser("vpn-status", help="Returns provider name of active VPN service if any.")
@@ -116,7 +116,7 @@ def add_vpn_status(subparsers):
 def add_vpn_turn_on(subparsers):
     parser_turn_on = subparsers.add_parser("vpn-turn-on", help="Turn on specified VPN service.")
     parser_turn_on.set_defaults(func=vpn_turn_on)
-    parser_turn_on.add_argument("provider", help="The specified provider", choices=providers['vpn'])
+    parser_turn_on.add_argument("--provider", help="The specified provider", choices=providers['vpn'])
     parser_turn_on.add_argument("-c", "--country", help="The location of the server through which you would like to "
                                                          "router traffic")
     parser_turn_on.add_argument("-p", "--protocol", help="The protocol.")
@@ -137,8 +137,8 @@ def add_agent_status_notifier(subparser):
 
     turnon_parser = subparser_captcha.add_parser("turnon", help ="Turn on the status notifier")
     turnon_parser.set_defaults(func=turnon_notifier)
-    turnon_parser.add_argument("minutes", help="Amount of minutes.", type=int)
-    turnon_parser.add_argument("recipient", help="Address where to send the email to")
+    turnon_parser.add_argument("--minutes", help="Amount of minutes.", type=int)
+    turnon_parser.add_argument("--recipient", help="Address where to send the email to")
 
     turnoff_parser = subparser_captcha.add_parser("turnoff", help="Turn off the status notifier.")
     turnoff_parser.set_defaults(func=turnoff_notifier)
@@ -157,7 +157,7 @@ def add_captcha_manager(subparser):
     get_balance_parser.set_defaults(func=captcha_get_balance)
 
     reload_parser = subparser_captcha.add_parser("reload", help="Top up balance for anticaptcha account.")
-    reload_parser.add_argument("amount", help="The amount to top up in US Dollars.", type=int)
+    reload_parser.add_argument("--amount", help="The amount to top up in US Dollars.", type=int)
     reload_parser.add_argument("-c", "--coin", help="The cryptocurrency to pay with.", default="btc")
     reload_parser.add_argument("-fm", "--feemultiplier", help="Choose the fee used for purchasing.")
     reload_parser.set_defaults(func=captcha_reload)
