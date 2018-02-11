@@ -45,7 +45,7 @@ class coinpaymentsVpnProvider(ABC):
 
     #use to validate password user-setting
     def isValidPassword(self, password):
-        valid = True 
+        valid = True
         if len(password) < 8:
             print("your password must be 8 characters long")
             valid = False
@@ -138,7 +138,7 @@ class coinpaymentsVpnProvider(ABC):
     def _retrieve_payment_info(self, currency, user_settings):
 
         self.isValidEmail(user_settings['email'])
-        if user_settings['password'] != None:        
+        if user_settings['password'] != None:
             self.isValidPassword(user_settings['password'])
         else:
             print("\n\nNo password provided --> password automatically set to 'Test_12345_Test_12345' \n\n")
