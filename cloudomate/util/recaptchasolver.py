@@ -34,8 +34,8 @@ class reCaptchaSolver:
         if (r.status_code == requests.codes.ok):
             j = json.loads(r.text)
             if (j["errorId"] == 0):
-                print("googleReCaptcha solved:")
-                print(r.text)
+                #print("googleReCaptcha solved:")
+                #print(r.text)
                 return j["solution"]
             else:
                 print(r.text)
