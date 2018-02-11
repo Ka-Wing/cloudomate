@@ -31,8 +31,16 @@ from cloudomate.hoster.vps.pulseservers import Pulseservers
 from cloudomate.hoster.vps.undergroundprivate import UndergroundPrivate
 from cloudomate.util.fakeuserscraper import UserScraper
 from cloudomate.util.settings import Settings
-from cloudomate.ethereum_wallet import Wallet as ethereum_wallet
 from cloudomate.wallet import Wallet as bitcoin_wallet
+
+import re
+from cloudomate import ethereum_wallet as E_wallet_util
+from cloudomate.ethereum_wallet import Wallet as EthereumWallet
+from cloudomate.hoster.vpn.vpnac_purchase import vpnacVPNPurchaser
+from cloudomate.hoster.vpn.torguard_purchase import torguardVPNPurchaser
+from cloudomate.util.installvpn_torguard import installVpnTorguard
+from cloudomate.util.installvpn_vpnac import installVpnAC
+from cloudomate.util.vpn_status_monitor import VpnStatusMonitor
 
 standard_library.install_aliases()
 
@@ -182,11 +190,88 @@ def captcha_manager(args):
 
 #TODO PHILIP
 def vpnac_purchase_handler(args):
-    pass
+    print("\n\n_________________VPN PURCHASE VPNAC_______________")
+
+    use_coin = 'BTC'
+    if args.r == True:
+        if args.password == None:
+            print("\n\n -r option suggests that your email is already registered, therefore you would need to provide a --password, use 'Test_12345_Test_12345' if your password was automatically generated\n\n")
+            exit(0)
+    if args.username == None:
+        print("\nplease provide an email with wich you would like to purchase VPNAC-VPN using --username option")
+        exit(0)
+    if args.coin == None:
+        print("\n\nPreferred coin not specified, automatically set to bitcoin")
+    elif args.coin == 'ETH' or args.coin == 'BTC': use_coin = args.coin
+    else:
+        print("\n\nNo wallet for: '" + args.coin + "' implemented, Coin type " + args.coin + " currently not supported")
+        print("\n\nPlease provide a valid coin type: currently ETH or BTC are currently supported\n\n")
+        exit(0)
+
+    if args.feemultiplier == None:
+        if use_coin == 'ETH': print("\n\nNo fee multiplier specified using ETHEREUM standard fee of: " + str(E_wallet_util.get_network_fee()))
+        elif use_coin == 'BTC': print("\n\nNo fee multiplier specified using BITCOIN standard fee of: " + str(bitcoin_wallet_util.get_network_fee()))
+
+    #TODO: pay with ether
+    return
+    vpnac = vpnacVPNPurchaser()
+    user_settings = {"email": args.username, "password": args.password, "registered": "0"}
+    if args.r == True: user_settings["registered"] = '1'
+
+    b = None
+    #vpnac.retrieve_ethereum(user_settings)
+    if use_coin == 'BTC':
+        b = vpnac.retrieve_bitcoin(user_settings)
+    elif use_coin == 'ETH':
+        b = vpnac.retrieve_ethereum(user_settings)
+
+    print("address: " + b['address'])
+    print("amount: " + b['amount'])
+
+    print(args)
+
 
 #TODO PHILIP
 def torguard_purchase_handler(args):
-    pass
+    print("\n\n_________________VPN PURCHASE TORGUARD_______________")
+
+    use_coin = 'BTC'
+    if args.r == True:
+        if args.password == None:
+            print("\n\n -r option suggests that your email is already registered, therefore you would need to provide a --password, use 'Test_12345_Test_12345' if your password was automatically generated\n\n")
+            exit(0)
+    if args.username == None:
+        print("\nplease provide an email with wich you would like to purchase VPNAC-VPN using --username option")
+        exit(0)
+    if args.coin == None:
+        print("\n\nPreferred coin not specified, automatically set to bitcoin")
+    elif args.coin == 'ETH' or args.coin == 'BTC': use_coin = args.coin
+    else:
+        print("\n\nNo wallet for: '" + args.coin + "' implemented, Coin type " + args.coin + " currently not supported")
+        print("\n\nPlease provide a valid coin type: currently ETH or BTC are currently supported\n\n")
+        exit(0)
+
+    if args.feemultiplier == None:
+        if use_coin == 'ETH': print("\n\nNo fee multiplier specified using ETHEREUM standard fee of: " + str(E_wallet_util.get_network_fee()))
+        elif use_coin == 'BTC': print("\n\nNo fee multiplier specified using BITCOIN standard fee of: " + str(bitcoin_wallet_util.get_network_fee()))
+
+    return
+    #TODO: pay with ether
+    torguard = torguardVPNPurchaser()
+    user_settings = {"email": args.username, "password": args.password, "registered": "0"}
+    if args.r == True: user_settings["registered"] = '1'
+
+    b = None
+    #vpnac.retrieve_ethereum(user_settings)
+    if use_coin == 'BTC':
+        b = torguard.retrieve_bitcoin(user_settings)
+    elif use_coin == 'ETH':
+        b = torguard.retrieve_ethereum(user_settings)
+
+    print("address: " + b['address'])
+    print("amount: " + b['amount'])
+
+    print(args)
 
 #TODO KW DINESH
 def mullvad_purchase_handler(args):
@@ -253,31 +338,26 @@ def add_parser_wallet_getfees(subparsers):
 
 #TODO PHILIP
 def wallet_getbalance(args):
-    print(args)
-
-    print("wallet_getbalance()")
     if args.wallet_type == "ethereum":
-        print("ethereum_wallet: This can be used to call any method.")
+        ethwallet = EthereumWallet()
+        print("\n\nEthereum Balance: \n" + str(ethwallet.get_balance()))
 
 #TODO PHILIP
 def wallet_getaddress(args):
-    print("wallet_getaddress()")
     if args.wallet_type == "ethereum":
-        print("ethereum_wallet: This can be used to call any method.")
+        ethwallet = EthereumWallet()
+        print("\n\nEthereum Address: \n" + str(ethwallet.get_address()))
 
 #TODO PHILIP
 def wallet_getprivatekey(args):
-    print("wallet_getprivatekey()")
     if args.wallet_type == "ethereum":
-        print("ethereum_wallet: This can be used to call any method.")
+        ethwallet = EthereumWallet()
+        print("\n\nEthereum Private Key: \n" + str(ethwallet.get_private_key()))
 
 #TODO PHILIP
 def wallet_fees(args):
-    print("wallet_getfees()")
     if args.wallet_type == "ethereum":
-        print("ethereum_wallet: This can be used to call any method.")
-
-
+        print("\n\nEthereum AVG Fee: \n" + str(E_wallet_util.get_network_fee()) + " Gwei")
 
 def vpn_purchase(args):
     if args.provider == "torguard":
@@ -288,6 +368,54 @@ def vpn_purchase(args):
         pass
     elif args.provider == "vpnac":
         vpnac_purchase_handler(args)
+
+def vpn_status_torguard(args):
+    print("\n_____________________STATUS TORGUARD_________________________\n")
+    vpnStatusMonitor = VpnStatusMonitor()
+    status = vpnStatusMonitor.get_status_torguard()
+
+    if status["webuser_email"] != None:
+        print("\n\nYou have one purchased web account for torguard")
+        print("\n\tuser: " + status["webuser_email"])
+        print("\tpassword: " + status["webuser_password"])
+    else: print("\n\nYou have no web-purchase credentials stored locally")
+    if status["service_stored_user"] != None:
+        print("\n\nYou have the following available openvpn service credentials:")
+        print ("\n\tservice_user: " + status["service_stored_user"])
+        print ("\tservice_password: " + status["service_stored_password"])
+        if status["valid"] != None:
+            print("\tValid until: " + status["valid"])
+        else: print("\tValid until: Unknown")
+    else: print("\n\nYou have no stored torguard openvpn service credentials loccally")
+    print("\n\n")
+
+#TODO PHILIP
+def vpn_status_vpnac(args):
+
+    print("\n_____________________STATUS VPNAC_________________________\n")
+    vpnStatusMonitor = VpnStatusMonitor()
+    status = vpnStatusMonitor.get_status_vpnac()
+
+    if status["webuser_email"] != None:
+        print("\n\nYou have one purchased web account for vpnac")
+        print("\n\tuser: " + status["webuser_email"])
+        print("\tpassword: " + status["webuser_password"])
+    else: print("\n\nYou have no web-purchase credentials stored locally")
+    if status["service_stored_user"] != None:
+        print("\n\nYou have the following available openvpn service credentials:")
+        print ("\n\tservice_user: " + status["service_stored_user"])
+        print ("\tservice_password: " + status["service_stored_password"])
+        if status["valid"] != None:
+            print("\tValid until: " + status["valid"])
+        else: print("\tValid until: Unknown")
+    else: print("\n\nYou have no stored vpnac openvpn service credentials loccally")
+    print("\n\n")
+
+def vpn_status_all(args):
+    vpnStatusMonitor = VpnStatusMonitor()
+    status = vpnStatusMonitor.get_status_purchased()
+    for aquired in purchased:
+        print(str(aquired))
 
 # Checks the VPN subscription
 def vpn_subscription_status(args):
@@ -314,7 +442,31 @@ def vpn_turn_on(args):
 
 #TODO PHILIP
 def torguard_turn_on_handler(args):
-    pass
+    print("\n_____________________CLOUDOMATE TORGUARD_________________________\n")
+    vpnsTorguard = installVpnTorguard()
+
+    if args.country == None:
+        print("\nPlease set valid --country option trough which you would like to route your traffic (set to 'random' for random)")
+        exit(0)
+    if args.country == 'random':
+        print("\nStarting vpn with routing trough random")
+        vpnsTorguard.startVpn()
+        exit(0)
+
+    list_countries = vpnsTorguard.getCountries()
+    if args.country == 'list':
+        print("\n\nCountries trough which traffic can be routed with torguard (set --country to 'random' for random):\n")
+        for country in list_countries:
+            print( "\t\t" + country.replace('TorGuard.', '').replace('.ovpn', ''))
+        exit(0)
+    else:
+        for country in list_countries:
+            if args.country == country.replace('TorGuard.', '').replace('.ovpn', ''):
+                print("\nStarting vpn with routing trough " + args.country)
+                vpnsTorguard.startVpn(country_route=country)
+                exit(0)
+        print("\n" + '"' + args.country + '"' + " invalid option. Use 'list' to list options")
+        exit(0)
 
 #TODO KW DINESH
 def mullvad_turn_on_handler(args):
@@ -327,8 +479,31 @@ def mullvad_turn_on_handler(args):
 
 #TODO PHILIP
 def vpnac_turn_on_handler(args):
-    pass
+    print("\n_____________________CLOUDOMATE VPNAC_________________________\n")
+    vpnac = installVpnAC()
 
+    if args.country == None:
+        print("\nPlease set valid --country option trough which you would like to route your traffic (set to 'random' for random)")
+        exit(0)
+    if args.country == 'random':
+        print("\nStarting vpn with routing trough random")
+        vpnac.startVpn()
+        exit(0)
+
+    list_countries = vpnac.getCountries()
+    if args.country == 'list':
+        print("\n\nCountries trough which traffic can be routed with vpnac (set --country to 'random' for random):\n")
+        for country in list_countries:
+            print( "\t\t" + country.replace('-aes256-tcp', '').replace('.ovpn', ''))
+        exit(0)
+    else:
+        for country in list_countries:
+            if args.country == country.replace('-aes256-tcp', '').replace('.ovpn', ''):
+                print("\nStarting vpn with routing trough " + args.country)
+                vpnac.startVpn(country_route=country)
+                exit(0)
+        print("\n" + '"' + args.country + '"' + " invalid option. Use 'list' to list options")
+        exit(0)
 
 def vpn_turn_off(args):
     if args.provider == "torguard":
