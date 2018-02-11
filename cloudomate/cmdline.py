@@ -189,10 +189,9 @@ def captcha_get_balance(args):
 def captcha_reload(args):
     if not args.amount > 0:
         print("Amount must be at least $1")
-        return
-
+        exit(0)
     c_Manager = captchaAccountManager()
-    c_Manager.reload_account()
+    c_Manager.reload_account(args.amount)
 
 #PHILIP
 def captcha_view_account(args):
@@ -201,11 +200,6 @@ def captcha_view_account(args):
     print("\n\nUsername: " + user_login['username'])
     print("Password: " + user_login['password'])
     print("Current API KeY: " + c_Manager.get_api_key() + "\n\n")
-
-#PHILIP
-def captcha_manager(args):
-    print("captcha_manager()")
-    print(args)
 
 #TODO PHILIP
 def vpnac_purchase_handler(args):
