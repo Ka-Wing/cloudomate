@@ -201,6 +201,12 @@ class Wallet(object):
         balance = self.web3.fromWei(balance_in_wei, "ether")
         return balance
 
+    def get_address(self):
+        return self.address
+
+    def get_private_key(self):
+        return self.key
+
     def pay(self, address_to_send, amount, fee=get_network_fee(),
             number_gas=NB_GAS_FOR_TRANSACTION): 
         """
@@ -230,6 +236,7 @@ class Wallet(object):
             return tx_hash
         else:
             print("No enough ether on your account")
+
     def getTransactionStatus(self, txHash):
         #transaction_Infos = self.web3.eth.getTransaction(txHash)
         transaction_Receipt = self.web3.eth.getTransactionReceipt(txHash)
