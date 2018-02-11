@@ -41,6 +41,7 @@ from cloudomate.hoster.vpn.torguard_purchase import torguardVPNPurchaser
 from cloudomate.util.installvpn_torguard import installVpnTorguard
 from cloudomate.util.installvpn_vpnac import installVpnAC
 from cloudomate.util.vpn_status_monitor import VpnStatusMonitor
+from cloudomate.util.captcha_account_manager import captchaAccountManager
 
 standard_library.install_aliases()
 
@@ -148,7 +149,7 @@ def add_captcha_manager(subparser):
     subparser_captcha.required = True
 
     view_amount_parser = subparser_captcha.add_parser("view-account", help ="Get account details")
-    view_amount_parser.set_defaults(func=captcha_manager)
+    view_amount_parser.set_defaults(func=captcha_view_account)
 
     get_balance_parser = subparser_captcha.add_parser("get-balance", help ="Get current balance")
     get_balance_parser.set_defaults(func=captcha_get_balance)
@@ -160,30 +161,42 @@ def add_captcha_manager(subparser):
     reload_parser.set_defaults(func=captcha_reload)
     pass
 
+#PHILIP
 def turnon_notifier(args):
     print("turnon_notifier()")
     print(args)
     print(args.minutes)
     print(type(args.minutes))
 
+#PHILIP
 def turnoff_notifier(args):
     print("turnoff_notifier()")
     print(args)
 
-
+#PHILIP
 def notifier_status(args):
     print("notifier_status()")
     print(args)
 
+#PHILIP
 def captcha_get_balance(args):
-    print("captcha_get_balance()")
-    print(args)
+    c_Manager = captchaAccountManager()
+    print("\n\nBalance captcha- account: " + str(c_Manager.get_balance()) + "\n\n")
 
+#PHILIP
 def captcha_reload(args):
-    print("captcha_reload()")
-    print(args)
-    pass
+    c_Manager = captchaAccountManager()
+    c_Manager.reload_account()
 
+#PHILIP
+def captcha_view_account(args):
+    c_Manager = captchaAccountManager()
+    user_login = c_Manager.get_anticaptcha_account_login()
+    print("\n\nUsername: " + user_login['username'])
+    print("Password: " + user_login['password'])
+    print("Current API KeY: " + c_Manager.get_api_key() + "\n\n")
+
+#PHILIP
 def captcha_manager(args):
     print("captcha_manager()")
     print(args)

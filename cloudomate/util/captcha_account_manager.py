@@ -1,18 +1,19 @@
 #testkey: fd58e13e22604e820052b44611d61d6c
-
+import json
 import os
+import requests
 
 class captchaAccountManager():
 
     captcha_api_key_location =  os.path.expanduser("~") + '/.config/config_captcha_account.cfg'
 
     def __init__(self):
-        print("\nCaptcha account config file: " + self.captcha_api_key_location)
+        #print("\nCaptcha account config file: " + self.captcha_api_key_location)
         pass
 
     #get the API-key needed for Anti-Captcha Api account
     def get_api_key(self):
-        print("\nRetrieving Captcha-Solving API key from: " + self.captcha_api_key_location)
+        #retrieve the Captcha-Solving API key from self.captcha_api_key_location
         if os.path.isfile(self.captcha_api_key_location):
             file = open(self.captcha_api_key_location, "r")
             lines = file.readlines()
@@ -33,6 +34,27 @@ class captchaAccountManager():
         tempfile.close()
         print("\nSuccesfully written config files....")
         pass
+
+    def get_balance(self):
+        # Query API for account balance
+        response = requests.post("https://api.anti-captcha.com/getBalance",
+                                 json={"clientKey": self.get_api_key()})
+
+        # Check response of HTTP request
+        if (response.status_code == requests.codes.ok):
+            response_json = json.loads(response.text)
+            if (response_json["errorId"] == 0):
+                #print("Successful, account balance returned")
+                return response_json["balance"]
+            else:
+                # Print API error
+                print(response.text)
+        else:
+            # Print request error
+            print(response.status_code)
+
+    def reload_account(self):
+        print("Reloading captcha account...")
     
     #Get the Account login (for signing into anti-captcha) currently assigned to this agent
     def get_anticaptcha_account_login(self):
