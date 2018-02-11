@@ -36,7 +36,7 @@ class torguardVPNPurchaser(coinpaymentsVpnProvider):
         except Exception as e:
             print(self._error_message(e))
 
-    def goToCoinPaymentsPage(self):
+    def goToCoinPaymentsPage(self,user_settings):
         # Puts VPN in cart and checks out.
         self.driver.get(self.PURCHASE_URL)
 
