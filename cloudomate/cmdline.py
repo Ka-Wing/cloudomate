@@ -165,7 +165,7 @@ def add_captcha_manager(subparser):
 
 #PHILIP
 def turnon_notifier(args):
-     if args.minutes == None or args.recipient == None:
+    if args.minutes == None or args.recipient == None:
         print("please provide Xminutes (notification will be send every X minutes) and recipient using --minutes <X> --recipient <email>")
         exit(0)
     agent_status_notifier = AgentNotificationManager()
