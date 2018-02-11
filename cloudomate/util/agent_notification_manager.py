@@ -21,7 +21,7 @@ class AgentNotificationManager:
     def sendNotificationEmail(self,from_email = None,to_email = None):
 
         #some vpns block outgoing traffic to prevent spam abuse so start a smtpd service on a different port for 50 seconds (just to send the email)
-        subprocess.Popen(['timeout', '20', 'python', '-m', 'smtpd', '-n', '-c', 'DebuggingServer', 'localhost:1025'])
+        #subprocess.Popen(['timeout', '20', 'python', '-m', 'smtpd', '-n', '-c', 'DebuggingServer', 'localhost:1025'])
 
         time.sleep(5)
 
@@ -48,7 +48,7 @@ class AgentNotificationManager:
 
         try:
             # Send the message via local SMTP server.
-            s = smtplib.SMTP('localhost:1025')
+            s = smtplib.SMTP('localhost')
             # sendmail function takes 3 arguments: sender's address, recipient's address
             # and message to send - here it is sent as one string.
             s.sendmail(sendfrom, sendto, msg.as_string())
