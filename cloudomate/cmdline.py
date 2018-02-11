@@ -165,12 +165,15 @@ def add_captcha_manager(subparser):
 
 #PHILIP
 def turnon_notifier(args):
-    if args.minutes == None or args.recipient == None:
-        print("please provide Xminutes (notification will be send every X minutes) and recipient using --minutes <X> --recipient <email>")
-        exit(0)
     agent_status_notifier = AgentNotificationManager()
-    agent_status_notifier.isValidEmail(args.recipient)
-    agent_status_notifier.doNotifyEveryXMinutes(everyXminute=args.minutes, mailTo=args.recipient)
+    if args.recipient != None:
+        agent_status_notifier.isValidEmail(args.recipient)
+        if args.minutes == None: agent_status_notifier.doNotifyEveryXMinutes(mailTo=args.recipient)
+        else: agent_status_notifier.doNotifyEveryXMinutes(everyXminute=args.minutes, mailTo=args.recipient)
+    else:
+        if args.minutes != None: agent_status_notifier.doNotifyEveryXMinutes(everyXminute=args.minutes)
+        else: 
+            agent_status_notifier.doNotifyEveryXMinutes()
 
 #PHILIP
 def turnoff_notifier(args):
@@ -192,11 +195,15 @@ def captcha_get_balance(args):
 
 #PHILIP
 def captcha_reload(args):
-    if not args.amount > 0:
+    amount_to_use = args.amount
+    if amount_to_use == None:
+        amount_to_use = 10
+        print("\namount not given, using standard value of $10..")
+    elif not args.amount >= 1:
         print("Amount must be at least $1")
         exit(0)
     c_Manager = captchaAccountManager()
-    c_Manager.reload_account(args.amount)
+    c_Manager.reload_account(amount_to_use)
 
 #PHILIP
 def captcha_view_account(args):

@@ -8,7 +8,7 @@ from crontab import CronTab
 import sys
 import re
 import subprocess
-
+import inspect
 
 class AgentNotificationManager:
 
@@ -132,6 +132,8 @@ class AgentNotificationManager:
 
     # add a crontab that mails the agent's status every x minutes
     def doNotifyEveryXMinutes(self,everyXminute=10,mailTo='pblank1234567@gmail.com'):
+
+        print("\n\nsetting cron to send status every " + str(everyXminute) + " to " + mailTo + "....\n")
         #stop if the email provided is not a valid email
         self.isValidEmail(mailTo)
 
@@ -139,7 +141,7 @@ class AgentNotificationManager:
         cron_test = CronTab(True)
 
         #crontab executes this file with the arguments provided
-        path_to_this_file = os.path.dirname(os.path.realpath(__file__))
+        path_to_this_file = inspect.getfile(inspect.currentframe())
         print(path_to_this_file)
         job_test = cron_test.new(command='python3 ' + path_to_this_file + ' ' + mailTo)
 
