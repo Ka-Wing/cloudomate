@@ -234,10 +234,6 @@ def add_bitcoin_wallet(subparsers):
 def add_parser_wallet_getbalance(subparsers):
     parser_getbalance = subparsers.add_parser("getbalance", help="Get balance of wallet.")
     parser_getbalance.set_defaults(type="command", func=wallet_getbalance)
-    parser_getbalance.add_argument("hallo", help="This is a test method")
-    parser_getbalance.add_argument("-a", "--armando", help="This is a test method")
-    #parser_getbalance.add_argument('v', help="v")
-    #parser_getbalance.set_argument('')
     pass
 
 def add_parser_wallet_getaddress(subparsers):
