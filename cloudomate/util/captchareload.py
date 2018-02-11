@@ -1,17 +1,19 @@
+import os
 import time
 import re
 import sys
 from selenium import webdriver
 from cloudomate.util.recaptchasolver import reCaptchaSolver
 from selenium.common.exceptions import NoSuchElementException
+import requests
 
-class anticaptcha:
+class anticaptchaReloader:
 
     loginlink = "https://anti-captcha.com/clients/entrance/login"
     username = ""
     password = ""
 
-    def __init(self, login_username, login_password):
+    def __init__(self, login_username, login_password):
         self.username = login_username
         self.password = login_password
 
@@ -80,8 +82,24 @@ class anticaptcha:
         options = webdriver.ChromeOptions()
         options.add_argument('headless')
         options.add_argument('disable-gpu');
-        options.add_argument('window-size=1920,1080');
-        driver = webdriver.Chrome(executable_path=driver_loc, chrome_options=options)
+        options.add_argument('window-size=1920,1080')
+        driver = None
+
+        connection_reset = True
+        while connection_reset:
+            connection_reset = False
+            try:
+                driver = webdriver.Chrome(executable_path=driver_loc, chrome_options=options)
+                pass
+            except Exception as e:
+                if e.errno == 104:
+                    connection_reset = True
+                    print("\nResetting connection...\n")
+                    pass
+                else:
+                    raise Exception(e)
+            pass
+
         driver.maximize_window()
 
         # Logs in
@@ -180,7 +198,3 @@ class anticaptcha:
         amount = re.findall("send (.*?)" + currency[1] + " to", instructions.text)[0]
 
         return {'amount' : str(amount), 'address' : str(address)}
-
-if __name__ == "__main__":
-    a = anticaptcha()
-    a.purchase_bitcoin()

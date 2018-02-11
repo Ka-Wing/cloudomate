@@ -43,7 +43,7 @@ from cloudomate.util.installvpn_torguard import installVpnTorguard
 from cloudomate.util.installvpn_vpnac import installVpnAC
 from cloudomate.util.vpn_status_monitor import VpnStatusMonitor
 from cloudomate.util.captcha_account_manager import captchaAccountManager
-
+from cloudomate.util.agent_notification_manager import AgentNotificationManager
 
 standard_library.install_aliases()
 
@@ -95,7 +95,7 @@ def execute(cmd=sys.argv[1:]):
 def add_vpn_purchase(subparsers):
     parser_purchase = subparsers.add_parser("vpn-purchase", help="Purchase VPN")
     parser_purchase.set_defaults(func=vpn_purchase)
-    parser_purchase.add_argument("provider", help="The specified provider", choices=providers['vpn'])
+    parser_purchase.add_argument("--provider", help="The specified provider", choices=providers['vpn'])
     parser_purchase.add_argument("-c","--coin", help="Choose the cryptocurrency used for purchasing.")
     parser_purchase.add_argument("-fm", "--feemultiplier", help="Choose the fee used for purchasing.")
     parser_purchase.add_argument("-a", "--accountnr", help="Choose the cryptocurrency used for purchasing.")
@@ -107,7 +107,7 @@ def add_vpn_purchase(subparsers):
 def add_vpn_subscription_status(subparsers):
     parser_subscription_status = subparsers.add_parser("vpn-subscription-status", help="Check status of the subscription of the VPN service")
     parser_subscription_status.set_defaults(func=vpn_subscription_status)
-    parser_subscription_status.add_argument("provider", help="The specified provider", choices=providers['vpn'])
+    parser_subscription_status.add_argument("--provider", help="The specified provider", choices=providers['vpn'])
 
 def add_vpn_status(subparsers):
     parser_vpn_status = subparsers.add_parser("vpn-status", help="Returns provider name of active VPN service if any.")
@@ -116,7 +116,7 @@ def add_vpn_status(subparsers):
 def add_vpn_turn_on(subparsers):
     parser_turn_on = subparsers.add_parser("vpn-turn-on", help="Turn on specified VPN service.")
     parser_turn_on.set_defaults(func=vpn_turn_on)
-    parser_turn_on.add_argument("provider", help="The specified provider", choices=providers['vpn'])
+    parser_turn_on.add_argument("--provider", help="The specified provider", choices=providers['vpn'])
     parser_turn_on.add_argument("-c", "--country", help="The location of the server through which you would like to "
                                                          "router traffic")
     parser_turn_on.add_argument("-p", "--protocol", help="The protocol.")
@@ -137,8 +137,8 @@ def add_agent_status_notifier(subparser):
 
     turnon_parser = subparser_captcha.add_parser("turnon", help ="Turn on the status notifier")
     turnon_parser.set_defaults(func=turnon_notifier)
-    turnon_parser.add_argument("minutes", help="Amount of minutes.", type=int)
-    turnon_parser.add_argument("recipient", help="Address where to send the email to")
+    turnon_parser.add_argument("--minutes", help="Amount of minutes.", type=int)
+    turnon_parser.add_argument("--recipient", help="Address where to send the email to")
 
     turnoff_parser = subparser_captcha.add_parser("turnoff", help="Turn off the status notifier.")
     turnoff_parser.set_defaults(func=turnoff_notifier)
@@ -157,7 +157,7 @@ def add_captcha_manager(subparser):
     get_balance_parser.set_defaults(func=captcha_get_balance)
 
     reload_parser = subparser_captcha.add_parser("reload", help="Top up balance for anticaptcha account.")
-    reload_parser.add_argument("amount", help="The amount to top up in US Dollars.", type=int)
+    reload_parser.add_argument("--amount", help="The amount to top up in US Dollars.", type=int)
     reload_parser.add_argument("-c", "--coin", help="The cryptocurrency to pay with.", default="btc")
     reload_parser.add_argument("-fm", "--feemultiplier", help="Choose the fee used for purchasing.")
     reload_parser.set_defaults(func=captcha_reload)
@@ -165,20 +165,28 @@ def add_captcha_manager(subparser):
 
 #PHILIP
 def turnon_notifier(args):
-    print("turnon_notifier()")
-    print(args)
-    print(args.minutes)
-    print(type(args.minutes))
+    agent_status_notifier = AgentNotificationManager()
+    if args.recipient != None:
+        agent_status_notifier.isValidEmail(args.recipient)
+        if args.minutes == None: agent_status_notifier.doNotifyEveryXMinutes(mailTo=args.recipient)
+        else: agent_status_notifier.doNotifyEveryXMinutes(everyXminute=args.minutes, mailTo=args.recipient)
+    else:
+        if args.minutes != None: agent_status_notifier.doNotifyEveryXMinutes(everyXminute=args.minutes)
+        else: 
+            agent_status_notifier.doNotifyEveryXMinutes()
 
 #PHILIP
 def turnoff_notifier(args):
-    print("turnoff_notifier()")
-    print(args)
+    agent_status_notifier = AgentNotificationManager()
+    agent_status_notifier.turnOffAutoNotify()
 
 #PHILIP
 def notifier_status(args):
-    print("notifier_status()")
-    print(args)
+    agent_status_notifier = AgentNotificationManager()
+    if agent_status_notifier.autoNotifyIsOn() == True:
+        print("active")
+    else:
+        print("not active")
 
 #PHILIP
 def captcha_get_balance(args):
@@ -187,12 +195,15 @@ def captcha_get_balance(args):
 
 #PHILIP
 def captcha_reload(args):
-    if not args.amount > 0:
+    amount_to_use = args.amount
+    if amount_to_use == None:
+        amount_to_use = 10
+        print("\namount not given, using standard value of $10..")
+    elif not args.amount >= 1:
         print("Amount must be at least $1")
-        return
-
+        exit(0)
     c_Manager = captchaAccountManager()
-    c_Manager.reload_account()
+    c_Manager.reload_account(amount_to_use)
 
 #PHILIP
 def captcha_view_account(args):
@@ -201,11 +212,6 @@ def captcha_view_account(args):
     print("\n\nUsername: " + user_login['username'])
     print("Password: " + user_login['password'])
     print("Current API KeY: " + c_Manager.get_api_key() + "\n\n")
-
-#PHILIP
-def captcha_manager(args):
-    print("captcha_manager()")
-    print(args)
 
 #TODO PHILIP
 def vpnac_purchase_handler(args):
