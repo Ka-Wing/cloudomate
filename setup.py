@@ -1,3 +1,4 @@
+#NOTE: do not run setup.py with an active vpn on
 import sys
 import os
 

@@ -369,6 +369,7 @@ def vpn_purchase(args):
     elif args.provider == "vpnac":
         vpnac_purchase_handler(args)
 
+#ADDED BY PHILIP
 def vpn_status_torguard(args):
     print("\n_____________________STATUS TORGUARD_________________________\n")
     vpnStatusMonitor = VpnStatusMonitor()
@@ -389,7 +390,7 @@ def vpn_status_torguard(args):
     else: print("\n\nYou have no stored torguard openvpn service credentials loccally")
     print("\n\n")
 
-#TODO PHILIP
+#ADDED BY PHILIP
 def vpn_status_vpnac(args):
 
     print("\n_____________________STATUS VPNAC_________________________\n")
@@ -411,6 +412,7 @@ def vpn_status_vpnac(args):
     else: print("\n\nYou have no stored vpnac openvpn service credentials loccally")
     print("\n\n")
 
+#ADDED BY PHILIP
 def vpn_status_all(args):
     vpnStatusMonitor = VpnStatusMonitor()
     status = vpnStatusMonitor.get_status_purchased()
@@ -421,6 +423,12 @@ def vpn_status_all(args):
 def vpn_subscription_status(args):
     print(args)
     print("vpn_subscription_status()")
+    if args.provider == 'torguard':
+        vpn_status_torguard(args)
+    elif args.provider == 'vpnac':
+        vpn_status_vpnac(args)
+    elif args.provider == 'all':
+        vpn_status_all(args)
     pass
 
 # Checks whether the VPN service is turned on or off.
