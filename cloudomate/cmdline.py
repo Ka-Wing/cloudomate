@@ -165,8 +165,11 @@ def add_captcha_manager(subparser):
 
 #PHILIP
 def turnon_notifier(args):
-    print("turnon_notifier()")
+     if args.minutes == None or args.recipient == None:
+        print("please provide Xminutes (notification will be send every X minutes) and recipient using --minutes <X> --recipient <email>")
+        exit(0)
     agent_status_notifier = AgentNotificationManager()
+    agent_status_notifier.isValidEmail(args.recipient)
     agent_status_notifier.doNotifyEveryXMinutes(everyXminute=args.minutes, mailTo=args.recipient)
 
 #PHILIP
