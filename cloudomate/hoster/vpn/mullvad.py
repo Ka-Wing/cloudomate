@@ -91,7 +91,7 @@ class MullVad(VpnHoster):
         return VpnStatus(online, now + expiration)
 
     def purchase(self, wallet, option="None", fee_multiplier=1):
-        #Check if account exists, else create new one
+        # Check if account exists, else create new one
         if self._settings.has_key("Mullvad", "accountnumber"):
             self._login()
         else:
@@ -101,14 +101,14 @@ class MullVad(VpnHoster):
 
         transaction_hash = self.pay(wallet, self.get_gateway(),
                                   str(page), fee_multiplier)
-        print(transaction_hash)
+        print("Transaction hash = " + transaction_hash)
 
     '''
     Hoster-specific methods that are needed to perform the actions
     '''
 
     def _register(self):
-        #Check if account is in configuration file
+        # Check if account is in configuration file
         try:
             captchakey = captchaAccountManager().get_api_key()
         except Exception as e:
