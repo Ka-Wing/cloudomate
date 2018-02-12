@@ -391,7 +391,6 @@ def vpnac_purchase_handler(args):
                   + str(bitcoin_wallet_util.get_network_fee()))
 
     # TODO: pay with ether
-    return
     vpnac = VpnacVPNPurchaser()
     user_settings = {
         "email": args.username,
