@@ -13,7 +13,7 @@ from builtins import range
 from future import standard_library
 from mechanicalsoup import StatefulBrowser
 
-from cloudomate.util.recaptchasolver import reCaptchaSolver
+from cloudomate.util.recaptchasolver import RecaptchaSolver
 from cloudomate.util.config import UserOptions
 
 standard_library.install_aliases()
@@ -34,7 +34,9 @@ class Infura(object):
 
         # Generate random strings for registration form
         for i in range(0, length):
-            random_sequence = random_sequence + possibilities[random.randrange(len(possibilities))]
+            random_sequence = \
+                random_sequence \
+                + possibilities[random.randrange(len(possibilities))]
 
         return random_sequence
 
@@ -46,12 +48,17 @@ class Infura(object):
         soup = self.browser.get_current_page()
         datasite_key = soup.select("div.g-recaptcha")[0]["data-sitekey"]
         c_manager_ = captchaAccountManager()
-        captcha_solver = reCaptchaSolver(c_manager_.get_api_key())
-        solution = captcha_solver.solveGoogleReCaptcha(registration,
+        captcha_solver = RecaptchaSolver(c_manager_.get_api_key())
+        solution = captcha_solver.solve_google_recaptcha(registration,
                                                          datasite_key)
 
         # Post data
-        random_email = self.random_generator(0) + "@" + self.random_generator(0) + "." + self.random_generator(length=3)
+        random_email = \
+            self.random_generator(0) \
+            + "@" \
+            + self.random_generator(0) \
+            + "." \
+            + self.random_generator(length=3)
         key = soup.select("input#element_4")[0]["value"]
         data = {"element_3_1": self.random_generator(0),
                 "element_3_2": self.random_generator(0),
@@ -72,18 +79,20 @@ class Infura(object):
                 "page_number": "1"
                 }
         # Use the post method on the given link
-        response = self.browser.post("https://form.infura.io/form/embed.php", data)
+        response = self.browser.post(
+            "https://form.infura.io/form/embed.php", data)
         # Checks if registration went wrong
         for line in response.text.split("\n"):
-            if ("error_message" in line):
-                raise Exception("Something went wrong during registration."
-                                "Might be incorrect Captcha solution. Try again.")
+            if "error_message" in line:
+                raise Exception("Something went wrong during "
+                                "registration. Might be incorrect "
+                                "Captcha solution. Try again.")
 
         # Gets the redirection link
         link = str(response.text.split("'")[1])
 
         # If registration link does not match as expected
-        if not re.match("https\:\/\/infura.io/setup\?key=", link):
+        if not re.match("https://infura.io/setup\?key=", link):
             raise Exception("Return link does not match as expected")
         else:
             return {"Mainnet": "https://mainnet.infura.io/" + key,

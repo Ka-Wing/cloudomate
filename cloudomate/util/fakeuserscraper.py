@@ -16,8 +16,8 @@ standard_library.install_aliases()
 
 class UserScraper(object):
     """
-    Scrapes fakeaddressgenerator.com for fake user data.
-    It also adds some basic additional information for server configuration.
+    Scrapes fakeaddressgenerator.com for fake user data. It also adds
+    some basic additional information for server configuration.
     """
 
     attributes = [
@@ -32,10 +32,14 @@ class UserScraper(object):
     ]
 
     pages = {
-        'NL': 'http://www.fakeaddressgenerator.com/World/Netherlands_address_generator',
-        'US': 'http://www.fakeaddressgenerator.com/World/us_address_generator',
-        'UK': 'http://www.fakeaddressgenerator.com/World/uk_address_generator',
-        'CA': 'http://www.fakeaddressgenerator.com/World/ca_address_generator',
+        'NL': 'http://www.fakeaddressgenerator.com/World/'
+              'Netherlands_address_generator',
+        'US': 'http://www.fakeaddressgenerator.com/World/'
+              'us_address_generator',
+        'UK': 'http://www.fakeaddressgenerator.com/World/'
+              'uk_address_generator',
+        'CA': 'http://www.fakeaddressgenerator.com/World/'
+              'ca_address_generator',
     }
 
     def __init__(self, country='NL'):
@@ -51,7 +55,8 @@ class UserScraper(object):
             attrs[attr] = self._get_attribute(attr)
 
         attrs['country_code'] = self.country_code
-        attrs['password'] = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(12))
+        attrs['password'] = ''.join(random.choice(
+            string.ascii_letters + string.digits) for _ in range(12))
         attrs['email'] = attrs['Username'] + '@email.com'
         attrs['rootpw'] = attrs['password']
         attrs['ns1'] = 'ns1'
@@ -66,10 +71,13 @@ class UserScraper(object):
         # Treat full name separately because it needs to be split
         if 'Full Name' in attrs:
             config['user'] = {}
-            config['user']['firstname'] = attrs['Full Name'].split('\xa0')[0]
-            config['user']['lastname'] = attrs['Full Name'].split('\xa0')[-1]
+            config['user']['firstname'] = \
+                attrs['Full Name'].split('\xa0')[0]
+            config['user']['lastname'] = \
+                attrs['Full Name'].split('\xa0')[-1]
 
-        # Map the possible user attributes to their config names and sections
+        # Map the possible user attributes to
+        # their config names and sections
         mapping = {
             'Street': ('address', 'address'),
             'City': ('address', 'city'),

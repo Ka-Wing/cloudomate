@@ -4,6 +4,7 @@ import random
 import requests
 import re
 import time
+from cloudomate.util.torguard_web_retriever import torguardServiceRetriever
 
 class installVpnTorguard():
 
@@ -51,8 +52,9 @@ class installVpnTorguard():
 
         web_login_file =  os.path.expanduser("~") + '/.config/torguard_login.txt'
         if os.path.isfile(web_login_file):
-            print("\n\nOnly weblogin credentials found: please run torguard_service_auth_retriever.py before calling this script to retrieve service credentials from web credentials")
-            exit(0)
+            #print("\n\nOnly weblogin credentials found: please run torguard_service_auth_retriever.py before calling this script to retrieve service credentials from web credentials")
+            torguardServiceRetriever()
+            #exit(0)
             return
             pass
         elif openvpn_passw == None or openvpn_passw == None:

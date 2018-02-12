@@ -21,7 +21,7 @@ class AgentNotificationManager:
     def sendNotificationEmail(self,from_email = None,to_email = None):
 
         #some vpns block outgoing traffic to prevent spam abuse so start a smtpd service on a different port for 50 seconds (just to send the email)
-        subprocess.Popen(['timeout', '20', 'python', '-m', 'smtpd', '-n', '-c', 'DebuggingServer', 'localhost:1025'])
+        #subprocess.Popen(['timeout', '20', 'python', '-m', 'smtpd', '-n', '-c', 'DebuggingServer', 'localhost:1025'])
 
         time.sleep(5)
 
@@ -48,7 +48,7 @@ class AgentNotificationManager:
 
         try:
             # Send the message via local SMTP server.
-            s = smtplib.SMTP('localhost:1025')
+            s = smtplib.SMTP('localhost')
             # sendmail function takes 3 arguments: sender's address, recipient's address
             # and message to send - here it is sent as one string.
             s.sendmail(sendfrom, sendto, msg.as_string())
@@ -107,9 +107,9 @@ class AgentNotificationManager:
 
     def contentSetup(self):
         # Create the body of the message (in HTML version).
-        html = """\<html><head></head><body>"""
+        html = """<html><head></head><body>"""
 
-        html += """\<h1>Your Bot giving an update</h1>"""
+        html += """<h1>Your Bot giving an update</h1>"""
         html += "<h4><span style='color:green;'>" + self.getAgentIdentifier() + "</span> (bot's name) </h4>"
         html += "<h4><span style='color:green;'>" + self.getStartingIpAdress() + "</span> (ip address of server it is running on)</h4>"
         html += "<h4><span style='color:green;'>" + self.getCurrentIpAdrress() + "</span> (ip address trough wich traffic is being routed)</h4>"
@@ -121,7 +121,7 @@ class AgentNotificationManager:
         else:
             html += "<h1 style='color:red;'>Extra Notification: </h1>"
             html += "<p>" + self.extra_notification + "</p>"
-        html += """\</body></html>"""
+        html += """</body></html>"""
         self.html_notification_content = html
 
     # use to validate email user-setting

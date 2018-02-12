@@ -1,6 +1,6 @@
 from selenium.common.exceptions import NoSuchElementException
 
-from cloudomate.hoster.vpn.coinpayments_vpn_provider import coinpaymentsVpnProvider
+from cloudomate.hoster.vpn.coinpayments_vpn_provider import CoinpaymentsVpnProvider
 import time
 #from cloudomate.bitcoin_wallet import Wallet as BitcoinWallet
 #from cloudomate.litcoin_wallet import Wallet as LitcoinWallet
@@ -10,7 +10,7 @@ import time
 #from cloudomate import ethereum_wallet as E_wallet_util
 import os
 
-class vpnacVPNPurchaser(coinpaymentsVpnProvider):
+class vpnacVPNPurchaser(CoinpaymentsVpnProvider):
 
     PURCHASE_URL = 'https://vpn.ac/vpn-accounts'
     COINPAYMENTS_URL = 'https://www.coinpayments.net/index.php?cmd=checkout'
@@ -30,7 +30,7 @@ class vpnacVPNPurchaser(coinpaymentsVpnProvider):
         return {"user": ["username", "password"]}
 
 
-    def goToCoinPaymentsPage(self, user_settings):
+    def go_to_coinpayments_page(self, user_settings):
         self.driver.get(self.PURCHASE_URL)
         self.driver.find_element_by_xpath('//*[@id="content"]/main/article[1]/div/div[1]/div[1]/div/div[3]/a').click()
         time.sleep(1)

@@ -34,7 +34,7 @@ class captchaAccountManager():
 
     def get_balance(self):
         # Query API for account balance
-        response = requests.post("https://api.anti-captcha.com/getBalance",
+        response = requests.post("https://api.anti-captcha.com/get_balance",
                                  json={"clientKey": self.get_api_key()})
 
         # Check response of HTTP request
