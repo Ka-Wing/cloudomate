@@ -3,7 +3,6 @@ import time
 import re
 import sys
 from selenium import webdriver
-from cloudomate.util.recaptchasolver import RecaptchaSolver
 from selenium.common.exceptions import NoSuchElementException
 import requests
 

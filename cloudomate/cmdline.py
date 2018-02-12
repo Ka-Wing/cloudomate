@@ -40,7 +40,7 @@ from cloudomate.hoster.vpn.vpnac_purchase import VpnacVPNPurchaser
 from cloudomate.hoster.vpn.torguard_purchase import TorguardVPNPurchaser
 from cloudomate.util.installvpn_torguard import InstallVpnTorguard
 from cloudomate.util.installvpn_vpnac import InstallVpnac
-from cloudomate.util.vpn_status_monitor import VpnStatusMonitor
+from cloudomate.util.vpnstatusmonitor import VpnStatusMonitor
 from cloudomate.util.captcha_account_manager \
     import CaptchaAccountManager
 from cloudomate.util.agent_notification_manager \

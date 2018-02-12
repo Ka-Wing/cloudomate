@@ -147,7 +147,7 @@ class CoinpaymentsVpnProvider(ABC):
         self.driver.maximize_window()
 
     @abstractmethod
-    def go_to_coinpayments_page(self):
+    def go_to_coinpayments_page(self, user_settings):
         pass
 
     # Don't invoke this method directly.
