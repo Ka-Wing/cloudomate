@@ -26,9 +26,10 @@ class anticaptchaReloader:
             amount = dictionary['amount']
             address = dictionary['address']
 
-            print("Paying " + amount + "BTC to " + address)
             # TODO: Pay with bitcoin
             fee = wallet_util.get_network_fee()*fee_multiplier
+            print("Paying " + amount + "BTC to " + address +
+                  "with fee = " + fee)
             transaction_hash = wallet.pay(address, amount, fee)
             if transaction_hash is not None:
                 print("Transaction hash = " + str(transaction_hash))

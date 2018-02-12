@@ -455,6 +455,24 @@ def vpnac_purchase_handler(args):
                     exit(0)
             print("\n\nTransaction has finished succesfully!...")
             vpnac.save_login_after_purchase()
+    elif args.coin == 'BTC':
+        settings = Settings()
+        settings.read_settings()
+        if settings.has_key('client', 'walletpath'):
+            wallet = bitcoin_wallet(wallet_path=settings.get(
+                'client', 'walletpath'))
+        else:
+            wallet = bitcoin_wallet()
+        if args.feemultiplier is not None:
+            fee = bitcoin_wallet_util.get_network_fee() * \
+                  args.feemultiplier
+        else:
+            fee = 1
+        print("Paying " + b['amount'] + "BTC to " + b['address'] +
+              "with fee = " + fee)
+        transaction_hash = wallet.pay(b['address'], b['amount'], fee)
+        if transaction_hash is not None:
+            print("Transaction hash = " + str(transaction_hash))
 
 
 # TODO PHILIP
@@ -565,6 +583,24 @@ def torguard_purchase_handler(args):
                     exit(0)
             print("\n\nTransaction has finished succesfully!...")
             torguard.save_login_after_purchase()
+    elif args.coin == 'BTC':
+        settings = Settings()
+        settings.read_settings()
+        if settings.has_key('client', 'walletpath'):
+            wallet = bitcoin_wallet(wallet_path=settings.get(
+                'client', 'walletpath'))
+        else:
+            wallet = bitcoin_wallet()
+        if args.feemultiplier is not None:
+            fee = bitcoin_wallet_util.get_network_fee() * \
+                  args.feemultiplier
+        else:
+            fee = 1
+        print("Paying " + b['amount'] + "BTC to " + b['address'] +
+              "with fee = " + fee)
+        transaction_hash = wallet.pay(b['address'], b['amount'], fee)
+        if transaction_hash is not None:
+            print("Transaction hash = " + str(transaction_hash))
 
 
 # TODO KW DINESH
