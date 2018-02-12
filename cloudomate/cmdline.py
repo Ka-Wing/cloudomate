@@ -371,15 +371,16 @@ def mullvad_purchase_handler(args):
         wallet = bitcoin_wallet(wallet_path=settings.get('client', 'walletpath'))
     else:
         wallet = bitcoin_wallet()
-    try:
-        if args.feemultiplier == None:
-            print("\n\nNo fee multiplier specified using BITCOIN standard fee of: " + str(bitcoin_wallet_util.get_network_fee()))
-            m.purchase(wallet)
-        else:
-            m.purchase(wallet, fee_multiplier=args.feemultiplier)
-    except Exception as e:
-        print("Error: Wallet file not found.")
-        print("Type 'electrum create' to create a new wallet, or provide a path to a wallet with the -w option")
+    #try:
+    if args.feemultiplier == None:
+        print("\n\nNo fee multiplier specified using BITCOIN standard fee of: " + str(bitcoin_wallet_util.get_network_fee()))
+        m.purchase(wallet)
+    else:
+        m.purchase(wallet, fee_multiplier=args.feemultiplier)
+    #except Exception as e:
+    #    print("Error: Wallet file not found.")
+    #    print("Type 'electrum create' to create a new wallet,
+    # or provide a path to a wallet with the -w option")
 
 def add_wallet(subparsers):
     wallet_parsers = subparsers.add_parser("wallet")

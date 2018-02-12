@@ -101,7 +101,8 @@ class MullVad(VpnHoster):
 
         transaction_hash = self.pay(wallet, self.get_gateway(),
                                   str(page), fee_multiplier)
-        print("Transaction hash = " + transaction_hash)
+        if transaction_hash is not None:
+            print("Transaction hash = " + str(transaction_hash))
 
     '''
     Hoster-specific methods that are needed to perform the actions
@@ -111,7 +112,7 @@ class MullVad(VpnHoster):
         # Check if account is in configuration file
         try:
             captchakey = captchaAccountManager().get_api_key()
-        except Exception as e:
+        except KeyError:
             print("Error: Anti Captcha account not found, please register one!")
             #print(self._error_message(e))
             sys.exit(1)
@@ -138,6 +139,8 @@ class MullVad(VpnHoster):
             self._browser.session.headers["Referer"] = self._browser.get_url()
 
             page = self._browser.submit_selected()
+            print(self.REGISTER_URL)
+            print(page.url)
             page_url = page.url
 
         #Delete image
@@ -159,7 +162,7 @@ class MullVad(VpnHoster):
                 new_account_number = new_account_number.split("<")[0].strip(" ")
                 break
         self._settings.put("Mullvad", "accountnumber", new_account_number)
-        self._settings.save_settings()
+        self._settings.save_settings(append=True)
 
         return page
 

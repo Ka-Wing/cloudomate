@@ -37,7 +37,7 @@ class Settings(object):
         files = self.settings.read(filename, encoding='utf-8')
         return len(files) > 0
 
-    def save_settings(self, filename=None):
+    def save_settings(self, filename=None, append=False):
         """Save this settings object to a file.
 
         If the filename is omitted it is saved to the default <user_config_dir>/cloudomate.conf location.
@@ -49,7 +49,11 @@ class Settings(object):
             filename = self._default_filename
 
         try:
-            self.settings.write(open(filename, 'w', encoding='utf-8'))
+            if append:
+                self.settings.write(
+                    open("\n" + filename, 'a', encoding='utf-8'))
+            else:
+                self.settings.write(open(filename, 'w', encoding='utf-8'))
         except IOError:
             print("Failed to write configuration to '{}', printing it to stdout:".format(filename), file=sys.stderr)
             self.settings.write(sys.stdout)
