@@ -173,7 +173,7 @@ class MullVad(VpnHoster):
 
     def _login(self):
         # Check if account is in configuration file
-        if not self._settings.get("Mullvad", "accountnumber"):
+        if not self._settings.has_key("Mullvad", "accountnumber"):
             print("Error: Account not found, please register one!")
             sys.exit(1)
 
