@@ -317,8 +317,22 @@ def captcha_reload(args):
         print("Amount must be at least $1")
         exit(0)
     captcha_manager = CaptchaAccountManager()
-    captcha_manager.reload_account(amount_to_use)
+    # Get bitcoin wallet
+    settings = Settings()
+    settings.read_settings()
+    if settings.has_key('client', 'walletpath'):
+        wallet = bitcoin_wallet(wallet_path=settings.get(
+            'client', 'walletpath'))
+    else:
+        wallet = bitcoin_wallet()
 
+    try:
+        captcha_manager.reload_account(wallet, amount_to_use,
+                                       args.feemultiplier)
+    except Exception as e:
+        print("Error: Wallet file not found.")
+        print("Type 'electrum create' to create a new wallet,"
+              " or provide a path to a wallet with the -w option")
 
 # PHILIP
 def captcha_view_account(args):
@@ -559,18 +573,18 @@ def mullvad_purchase_handler(args):
             'client', 'walletpath'))
     else:
         wallet = bitcoin_wallet()
-    # try:
-    if args.feemultiplier is None:
-        print("\n\nNo fee multiplier specified using "
-              "BITCOIN standard fee of: "
-              + str(bitcoin_wallet_util.get_network_fee()))
-        m.purchase(wallet)
-    else:
-        m.purchase(wallet, fee_multiplier=args.feemultiplier)
-    # except Exception as e:
-    #    print("Error: Wallet file not found.")
-    #    print("Type 'electrum create' to create a new wallet,
-    # or provide a path to a wallet with the -w option")
+    try:
+        if args.feemultiplier is None:
+            print("\n\nNo fee multiplier specified using "
+                  "BITCOIN standard fee of: "
+                  + str(bitcoin_wallet_util.get_network_fee()))
+            m.purchase(wallet)
+        else:
+            m.purchase(wallet, fee_multiplier=args.feemultiplier)
+    except Exception as e:
+        print("Error: Wallet file not found.")
+        print("Type 'electrum create' to create a new wallet,"
+              " or provide a path to a wallet with the -w option")
 
 
 def add_wallet(subparsers):

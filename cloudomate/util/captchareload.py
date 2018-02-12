@@ -4,6 +4,7 @@ import re
 import sys
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
+from cloudomate import wallet as wallet_util
 import requests
 
 class anticaptchaReloader:
@@ -16,8 +17,9 @@ class anticaptchaReloader:
         self.username = login_username
         self.password = login_password
 
-    # Use this method for purchasing with Bitcoin.
-    def purchase_bitcoin(self, amount=10):
+    # Use this method for purchasing with Bitcoin, with parameter
+    # amount in dollars.
+    def purchase_bitcoin(self, wallet, amount=10, fee_multiplier=1):
         try:
             dictionary = \
                 self._return_address(["Bitcoin", "BTC", "btc"], amount)
@@ -26,6 +28,10 @@ class anticaptchaReloader:
 
             print("Paying " + amount + "BTC to " + address)
             # TODO: Pay with bitcoin
+            fee = wallet_util.get_network_fee()*fee_multiplier
+            transaction_hash = wallet.pay(address, amount, fee)
+            if transaction_hash is not None:
+                print("Transaction hash = " + str(transaction_hash))
 
         except Exception as e:
             print("Error "

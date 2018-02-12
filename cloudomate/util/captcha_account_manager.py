@@ -64,11 +64,11 @@ class CaptchaAccountManager:
             # Print request error
             print(response.status_code)
 
-    def reload_account(self, amount):
+    def reload_account(self, wallet, amount, feemultiplier):
         login = self.get_anticaptcha_account_login()
         print("Reloading captcha account...")
         a = anticaptchaReloader(login['username'], login['password'])
-        a.purchase_bitcoin(amount)
+        a.purchase_bitcoin(wallet, amount, feemultiplier)
     
     # Get the Account login (for signing into anti-captcha) currently
     # assigned to this agent
