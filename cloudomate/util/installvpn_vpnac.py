@@ -174,7 +174,7 @@ class InstallVpnac:
             + '/' \
             + self.userpass_file_name
         print(userpassfile)
-        startvpn_cm = 'sudo openvpn --config ' \
+        startvpn_cm = 'sudo nohup openvpn --config ' \
                       + file_ \
                       + ' --script-security 2 --dhcp-option DNS ' \
                         '8.8.8.8 --up /etc/openvpn/' \

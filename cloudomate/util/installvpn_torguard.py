@@ -201,7 +201,7 @@ class InstallVpnTorguard():
         print(c_config_crt)
 
         startvpn_cm = \
-            'sudo openvpn --config ' \
+            'sudo nohup openvpn --config ' \
             + file_ \
             + ' --script-security 2 --dhcp-option DNS 8.8.8.8 ' \
               '--up /etc/openvpn/update-resolv-conf --down ' \
@@ -211,7 +211,7 @@ class InstallVpnTorguard():
             + userpassfile + '> /dev/null &'
         if use_ta_key:
             startvpn_cm = \
-                'openvpn --config ' \
+                'sudo nohup openvpn --config ' \
                 + file_ \
                 + ' --script-security 2 --dhcp-option DNS 8.8.8.8 ' \
                   '--up /etc/openvpn/update-resolv-conf --down ' \
