@@ -1,6 +1,6 @@
 from selenium.common.exceptions import NoSuchElementException
 
-from cloudomate.hoster.vpn.coinpayments_vpn_provider import coinpaymentsVpnProvider
+from cloudomate.hoster.vpn.coinpayments_vpn_provider import CoinpaymentsVpnProvider
 import time
 #from cloudomate.bitcoin_wallet import Wallet as BitcoinWallet
 # from cloudomate.litcoin_wallet import Wallet as LitcoinWallet
@@ -11,7 +11,7 @@ from cloudomate import ethereum_wallet as E_wallet_util
 import os
 
 
-class torguardVPNPurchaser(coinpaymentsVpnProvider):
+class torguardVPNPurchaser(CoinpaymentsVpnProvider):
     PURCHASE_URL = 'https://torguard.net/cart.php?gid=2'
     COINPAYMENTS_URL = 'https://www.coinpayments.net/index.php?cmd=checkout'
 
@@ -36,7 +36,7 @@ class torguardVPNPurchaser(coinpaymentsVpnProvider):
         except Exception as e:
             print(self._error_message(e))
 
-    def goToCoinPaymentsPage(self,user_settings):
+    def go_to_coinpayments_page(self, user_settings):
         # Puts VPN in cart and checks out.
         self.driver.get(self.PURCHASE_URL)
 

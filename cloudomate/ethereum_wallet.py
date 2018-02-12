@@ -197,7 +197,7 @@ class Wallet(object):
 
         """
         assert self.web3.isConnected()
-        balance_in_wei = self.web3.eth.getBalance(self.address) 
+        balance_in_wei = self.web3.eth.get_balance(self.address)
         balance = self.web3.fromWei(balance_in_wei, "ether")
         return balance
 
@@ -220,7 +220,7 @@ class Wallet(object):
         amount_in_wei = self.web3.toWei(amount, "ether") 
         fee_in_wei = self.web3.toWei(fee, "gwei") # 1 Gwei = 1 billion wei
 	
-        if(self.web3.eth.getBalance(self.address) >= amount_in_wei + fee_in_wei):
+        if(self.web3.eth.get_balance(self.address) >= amount_in_wei + fee_in_wei):
             tx = Transaction(
             nonce = nonce_address,
             gasprice = fee_in_wei, 
