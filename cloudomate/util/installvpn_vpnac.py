@@ -14,10 +14,10 @@ class InstallVpnac:
     c_logdir = os.path.expanduser("~") + '/.config/vpnac_log'
     c_vpn_config_dir = \
         os.path.expanduser("~") \
-        + '/vpnac_openvpn_config_files'
+        + '/.config/vpnac_openvpn_config_files'
     c_userpass_dir = \
         os.path.expanduser("~") \
-        + '/vpnac_open_vpn_userpass'
+        + '/.config/vpnac_open_vpn_userpass'
 
     # Name of the folder that ultimately is extracted by the
     # downloaded zip files (containing .ovpn files)
@@ -48,6 +48,15 @@ class InstallVpnac:
     def __init__(
             self, openvpn_user=None, openvpn_passw=None,
             openvpn_auth_active_until=None):
+
+        # Creates a config dir if it does not exist
+        if os.path.isdir(self.c_logdir) is False:
+            os.popen('mkdir ' + self.c_logdir).read()
+        if os.path.isdir(self.c_vpn_config_dir) is False:
+            os.popen('mkdir ' + self.c_vpn_config_dir).read()
+        if os.path.isdir(self.c_userpass_dir) is False:
+            os.popen('mkdir ' + self.c_userpass_dir).read()
+
         self.service_auth_active_until = openvpn_auth_active_until
         if openvpn_user is not None and openvpn_passw is not None:
             self.vpnusern_ = openvpn_user
@@ -165,28 +174,22 @@ class InstallVpnac:
             + '/' \
             + self.userpass_file_name
         print(userpassfile)
-        startvpn_cm = 'openvpn --config ' \
+        startvpn_cm = 'sudo openvpn --config ' \
                       + file_ \
                       + ' --script-security 2 --dhcp-option DNS ' \
                         '8.8.8.8 --up /etc/openvpn/' \
                         'update-resolv-conf --down /etc/openvpn/' \
                         'update-resolv-conf --auth-user-pass ' \
-                      + userpassfile
+                      + userpassfile + ' > /dev/null &'
         print(startvpn_cm)
+
+        print("VPN started")
         output = os.popen(startvpn_cm).read()
         print(output)
 
     def download_config_files(self, udp=False):
         # Variable for storing some log information
         logging_info = "\n----------\n\n"
-
-        # Creates a config dir if it does not exist
-        if os.path.isdir(self.c_logdir) is not False:
-            os.popen('mkdir ' + self.c_logdir).read()
-        if os.path.isdir(self.c_vpn_config_dir) is not False:
-            os.popen('mkdir ' + self.c_vpn_config_dir).read()
-        if os.path.isdir(self.c_userpass_dir) is not False:
-            os.popen('mkdir ' + self.c_userpass_dir).read()
 
         # Full file path and file name to which we will save the vpn
         # config zip file

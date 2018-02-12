@@ -843,21 +843,23 @@ def vpn_status_vpnac(args):
 def vpn_status_all(args):
     vpn_status_monitor = VpnStatusMonitor()
     purchase_status = vpn_status_monitor.get_status_purchased()
-    for aquired in purchased:
-        print(str(aquired))
+    print("\n\nYour purchases:\n")
+    for status in purchase_status:
+        print("\t" +str(status))
+    if len(purchase_status) == 0:
+        print("\nYou have no purchased vpn subcscriptions")
+    print("\n\nuse --provider <vpn-provider-name> to get a more detailed description")
 
 
 # Checks the VPN subscription
 def vpn_subscription_status(args):
-    print(args)
-    print("vpn_subscription_status()")
     if args.provider == 'torguard':
         vpn_status_torguard(args)
     elif args.provider == 'vpnac':
         vpn_status_vpnac(args)
     elif args.provider == 'mullvad':
         vpn_subscription_status_mullvad()
-    elif args.provider == 'all':
+    elif args.provider == None:
         vpn_status_all(args)
     pass
 

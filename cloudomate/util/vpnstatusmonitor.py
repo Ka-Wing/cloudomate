@@ -102,10 +102,10 @@ class VpnStatusMonitor:
 
         purchased = []
         status_torguard = self.get_status_torguard()
-        if status_torguard['web_user_email'] is not None:
+        if status_torguard['webuser_email'] is not None:
             purchased.append('torguard')
         status_vpnac = self.get_status_vpnac()
-        if status_vpnac['web_user_email'] is None:
+        if status_vpnac['webuser_email'] is not None:
             purchased.append('vpnac')
         return purchased
 

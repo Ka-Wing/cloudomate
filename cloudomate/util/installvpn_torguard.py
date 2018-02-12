@@ -201,14 +201,14 @@ class InstallVpnTorguard():
         print(c_config_crt)
 
         startvpn_cm = \
-            'openvpn --config ' \
+            'sudo openvpn --config ' \
             + file_ \
             + ' --script-security 2 --dhcp-option DNS 8.8.8.8 ' \
               '--up /etc/openvpn/update-resolv-conf --down ' \
               '/etc/openvpn/update-resolv-conf --ca ' \
             + c_config_crt \
             + ' --auth-user-pass ' \
-            + userpassfile
+            + userpassfile + '> /dev/null &'
         if use_ta_key:
             startvpn_cm = \
                 'openvpn --config ' \
@@ -221,9 +221,10 @@ class InstallVpnTorguard():
                 + c_config_key \
                 + ' 1 ' \
                 + ' --auth-user-pass ' \
-                + userpassfile
+                + userpassfile + ' > /dev/null &'
 
         print(startvpn_cm)
+        print("\n\nVPN started")
         output = os.popen(startvpn_cm).read()
         print(output)
 

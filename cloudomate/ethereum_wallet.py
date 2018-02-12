@@ -211,7 +211,7 @@ class Wallet(object):
 
         """
         assert self.web3.isConnected()
-        balance_in_wei = self.web3.eth.get_balance(self.address)
+        balance_in_wei = self.web3.eth.getBalance(self.address)
         balance = self.web3.fromWei(balance_in_wei, "ether")
         return balance
 
