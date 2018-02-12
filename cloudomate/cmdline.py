@@ -765,6 +765,8 @@ def vpn_purchase(args):
         pass
     elif args.provider == "vpnac":
         vpnac_purchase_handler(args)
+    elif args.provider == None:
+        print("\nPlease specify a provider using --provider <name> of whom you would like to purchase VPN-service\n\n")
 
 
 # ADDED BY PHILIP
