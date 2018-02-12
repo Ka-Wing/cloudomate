@@ -121,19 +121,19 @@ class MullVad(VpnHoster):
             # print(self._error_message(e))
             sys.exit(1)
 
-        self._browser.open(self.REGISTER_URL)
-        form = self._browser.select_form()
-        soup = self._browser.get_current_page()
-
-        # Get captcha needed for registration
-        img = soup.select("img.captcha")[0]["src"]
-        urlretrieve("https://www.mullvad.net" + img,
-                    "captcha.png")
-
-        page_url = self._browser.get_url()
+        page_url = self.REGISTER_URL
 
         # Check if registration was successful
         while str(page_url) == self.REGISTER_URL:
+            self._browser.open(self.REGISTER_URL)
+            form = self._browser.select_form()
+            soup = self._browser.get_current_page()
+
+            # Get captcha needed for registration
+            img = soup.select("img.captcha")[0]["src"]
+            urlretrieve("https://www.mullvad.net" + img,
+                        "captcha.png")
+
             # Solve captcha
             captcha_solver = CaptchaSolver(captchakey)
             solution = captcha_solver.solve_captcha_text_case_sensitive(
@@ -167,7 +167,7 @@ class MullVad(VpnHoster):
                 break
         self._settings.put(
             "Mullvad", "accountnumber", new_account_number)
-        self._settings.save_settings(append=True)
+        self._settings.save_settings()
 
         return page
 

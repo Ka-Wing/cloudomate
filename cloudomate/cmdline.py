@@ -552,6 +552,7 @@ def torguard_purchase_handler(args):
 # TODO KW DINESH
 def mullvad_purchase_handler(args):
     settings = Settings()
+    settings.read_settings()
     m = MullVad(settings)
     if settings.has_key('client', 'walletpath'):
         wallet = bitcoin_wallet(wallet_path=settings.get(
@@ -650,6 +651,7 @@ def add_parser_wallet_getfees(subparsers):
 # Get(un)confirmed bitcoin wallet balance
 def wallet_getbalance_bitcoin():
     settings = Settings()
+    settings.read_settings()
     if settings.has_key('client', 'walletpath'):
         wallet = bitcoin_wallet(
             wallet_path=settings.get('client', 'walletpath'))
@@ -669,6 +671,7 @@ def wallet_getbalance_bitcoin():
 # Get bitcoin wallet addresses
 def wallet_getaddress_bitcoin():
     settings = Settings()
+    settings.read_settings()
     if settings.has_key('client', 'walletpath'):
         wallet = bitcoin_wallet(
             wallet_path=settings.get('client', 'walletpath'))
@@ -685,6 +688,7 @@ def wallet_getaddress_bitcoin():
 # Get bitcoin wallet fees
 def wallet_getfees_bitcoin():
     settings = Settings()
+    settings.read_settings()
     if settings.has_key('client', 'walletpath'):
         wallet = bitcoin_wallet(
             wallet_path=settings.get('client', 'walletpath'))
