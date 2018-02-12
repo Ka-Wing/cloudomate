@@ -10,18 +10,16 @@ from builtins import float
 from builtins import str
 from builtins import int
 
-import requests
 import os
 
 from forex_python.converter import CurrencyRates
 from future import standard_library
-
 from cloudomate.gateway.custom_mullvad import CustomMullvad
-from cloudomate.hoster.vpn.vpn_hoster import VpnHoster, VpnOption, VpnStatus, VpnConfiguration
+from cloudomate.hoster.vpn.vpn_hoster \
+    import VpnHoster, VpnOption, VpnStatus, VpnConfiguration
 from cloudomate.util.captchasolver import CaptchaSolver
-
-from cloudomate.util.settings import Settings
-from cloudomate.util.captcha_account_manager import captchaAccountManager
+from cloudomate.util.captcha_account_manager \
+    import captchaAccountManager
 
 standard_library.install_aliases()
 
@@ -36,7 +34,8 @@ class MullVad(VpnHoster):
     LOGIN_URL = "https://www.mullvad.net/en/account/login/"
     ORDER_URL = "https://www.mullvad.net/en/account"
     OPTIONS_URL = "https://www.mullvad.net/en"
-    INFO_URL = "https://mullvad.net/en/guides/linux-openvpn-installation/"
+    INFO_URL = \
+        "https://mullvad.net/en/guides/linux-openvpn-installation/"
 
     '''
     Information about the Hoster
@@ -61,7 +60,8 @@ class MullVad(VpnHoster):
     def get_configuration(self):
         return VpnConfiguration('No user name needed',
                                 'No password needed',
-                                'Use install_mullvad.py in util folder to install the VPN')
+                                'Use install_mullvad.py in util '
+                                'folder to install the VPN')
 
     @classmethod
     def get_options(cls):
@@ -76,7 +76,8 @@ class MullVad(VpnHoster):
         price = round(CurrencyRates().convert("EUR", "USD", eur), 2)
 
         name, _ = cls.get_metadata()
-        option = VpnOption(name, "OpenVPN", price, sys.maxsize, sys.maxsize)
+        option = VpnOption(name, "OpenVPN",
+                           price, sys.maxsize, sys.maxsize)
         return [option]
 
     def get_status(self):
@@ -87,7 +88,8 @@ class MullVad(VpnHoster):
         (online, expiration) = self._check_vpn_date()
         expiration = datetime.timedelta(days=int(expiration))
 
-        # Add the remaining days to the current date to get expiration date
+        # Add the remaining days to the current date
+        # to get expiration date
         return VpnStatus(online, now + expiration)
 
     def purchase(self, wallet, option="None", fee_multiplier=1):
@@ -99,8 +101,9 @@ class MullVad(VpnHoster):
         # Prepare for the purchase on the MullVad website
         page = self._order()
 
-        transaction_hash = self.pay(wallet, self.get_gateway(),
-                                  str(page), fee_multiplier)
+        transaction_hash = self.pay(
+            wallet, self.get_gateway(),
+            str(page), fee_multiplier)
         if transaction_hash is not None:
             print("Transaction hash = " + str(transaction_hash))
 
@@ -113,8 +116,9 @@ class MullVad(VpnHoster):
         try:
             captchakey = captchaAccountManager().get_api_key()
         except KeyError:
-            print("Error: Anti Captcha account not found, please register one!")
-            #print(self._error_message(e))
+            print("Error: Anti Captcha account not found, "
+                  "please register one!")
+            # print(self._error_message(e))
             sys.exit(1)
 
         self._browser.open(self.REGISTER_URL)
@@ -136,18 +140,19 @@ class MullVad(VpnHoster):
                 "./captcha.png")
             form["captcha_1"] = solution
 
-            self._browser.session.headers["Referer"] = self._browser.get_url()
+            self._browser.session.headers["Referer"] = \
+                self._browser.get_url()
 
             page = self._browser.submit_selected()
             print(self.REGISTER_URL)
             print(page.url)
             page_url = page.url
 
-        #Delete image
+        # Delete image
         os.remove("captcha.png")
 
         # Check if registration was successful
-        #if page.url == self.REGISTER_URL:
+        # if page.url == self.REGISTER_URL:
         #    # An error occurred
         #    print("The captcha was wrong")
         #    sys.exit(2)
@@ -159,15 +164,17 @@ class MullVad(VpnHoster):
         for line in new_page.split("\n"):
             if "Your account number:" in line:
                 new_account_number = line.split(":")[1]
-                new_account_number = new_account_number.split("<")[0].strip(" ")
+                new_account_number = \
+                    new_account_number.split("<")[0].strip(" ")
                 break
-        self._settings.put("Mullvad", "accountnumber", new_account_number)
+        self._settings.put(
+            "Mullvad", "accountnumber", new_account_number)
         self._settings.save_settings(append=True)
 
         return page
 
     def _login(self):
-        #Check if account is in configuration file
+        # Check if account is in configuration file
         if not self._settings.get("Mullvad", "accountnumber"):
             print("Error: Account not found, please register one!")
             sys.exit(1)
@@ -176,8 +183,10 @@ class MullVad(VpnHoster):
         form = self._browser.select_form()
 
         # Use account number to login
-        form["account_number"] = self._settings.get("Mullvad", "accountnumber")
-        self._browser.session.headers["Referer"] = self._browser.get_url()
+        form["account_number"] = \
+            self._settings.get("Mullvad", "accountnumber")
+        self._browser.session.headers["Referer"] = \
+            self._browser.get_url()
         page = self._browser.submit_selected()
 
         # Check if login was successful
@@ -188,20 +197,21 @@ class MullVad(VpnHoster):
         return page
 
     def _order(self):
-        #Check if account exists, else create new one
-        #try:
-        #    self._settings.get("Mullvad", "accountnumber")
-        #except Exception as e:
-        #    self._register()
-        #else:
-        #    self._login()
+        # Check if account exists, else create new one
+        # try:
+        #     self._settings.get("Mullvad", "accountnumber")
+        # except Exception as e:
+        #     self._register()
+        # else:
+        #     self._login()
 
         self._browser.open(self.ORDER_URL)
         form = self._browser.select_form()
 
         # Order one month
         form["months"] = "1"
-        self._browser.session.headers["Referer"] = self._browser.get_url()
+        self._browser.session.headers["Referer"] = \
+            self._browser.get_url()
         self._browser.submit_selected()
         page = self._browser.get_current_page()
 
@@ -209,28 +219,17 @@ class MullVad(VpnHoster):
 
     def _check_vpn_date(self):
         # Checks if VPN expired
-        #self._login()
+        # self._login()
         soup = self._browser.get_current_page()
         expire_date = soup.select(".balance-header")[0].get_text()
         print(expire_date.split("\n")[1].strip())
         expire_date = expire_date.split("\n")[2]
         index_before_date = expire_date.index("in")
         index_after_date = expire_date.index("days")
-        expire_date = expire_date[index_before_date + 3:index_after_date - 1]
+        expire_date = \
+            expire_date[index_before_date + 3:index_after_date - 1]
 
-        if (expire_date <= "0"):
-            return (False, expire_date)
+        if expire_date <= "0":
+            return False, expire_date
         else:
-            return (True, expire_date)
-
-if __name__ == '__main__':
-    settings = Settings()
-    #settings.put("Mullvad", "accountnumber", "6798499523758101")
-    #settings.put("Anti Captcha", "anticaptchaaccount", "fd58e13e22604e820052b44611d61d6c")
-    #settings.save_settings()
-    settings.read_settings()
-    mullvad = MullVad(settings)
-    #print(mullvad._register())
-    #print(mullvad._check_vpn_date())
-    print(mullvad._order())
-
+            return True, expire_date

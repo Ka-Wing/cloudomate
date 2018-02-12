@@ -109,7 +109,6 @@ class anticaptchaReloader:
                     executable_path=driver_loc, chrome_options=options)
                 pass
             except Exception as e:
-                # TODO e.errno does no exist
                 if e.errno == 104:
                     connection_reset = True
                     print("\nResetting connection...\n")

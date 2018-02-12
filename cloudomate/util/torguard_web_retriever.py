@@ -169,7 +169,6 @@ class TorguardServiceRetriever:
                 self.driver = webdriver.Chrome(
                     executable_path=driver_loc, chrome_options=options)
             except Exception as e:
-                # TODO e.errno does not exist.
                 if e.errno == 104:
                     connection_reset = True
                     print("\nResetting connection...\n")
