@@ -15,7 +15,9 @@ class VpnacVPNPurchaser(CoinpaymentsVpnProvider):
     PURCHASE_URL = 'https://vpn.ac/vpn-accounts'
     COINPAYMENTS_URL = 'https://www.coinpayments.net/index.php?cmd=checkout'
 
-    saveUserLoginFile = os.path.expanduser("~") + '/.config/vpnac_login.txt'
+    saveUserLoginFile = \
+        os.path.expanduser("~") \
+        + '/.config/vpnac_login.txt'
 
     @staticmethod
     def get_metadata():
@@ -70,19 +72,3 @@ class VpnacVPNPurchaser(CoinpaymentsVpnProvider):
         time.sleep(2)
         if (user_settings.get("registered") == "0"):
             pass  # Change registration to 1 for ever.
-
-
-
-if __name__ == '__main__':
-    vpnac = VpnacVPNPurchaser()
-    user_settings = {"email": "mohamestest232westesttest@gmail.com", "password": "sfdjlsdmfsdlfkTest_12312", "registered": "1"}
-    vpnac.retrieve_ethereum(user_settings)
-    # b = vpnac.retrieve_ethereum(user_settings)
-    # print(b['amount'])
-    # print(b['address'])
-    # walletTest = LitcoinWallet()
-    # tg.pay(dict['amount'],dict['address'],'LTC',walletTest)
-    # walletTest = EthereumWallet()
-    # print(str(walletTest.get_balance()))
-    # vpnac.pay(b['amount'], b['address'], 'ETH', walletTest)
-

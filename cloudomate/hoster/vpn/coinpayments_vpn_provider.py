@@ -24,7 +24,7 @@ class CoinpaymentsVpnProvider(ABC):
         pass
 
     @abstractmethod
-    def save_user_login_file(self):
+    def saveUserLoginFile(self):
         pass
 
     driver = None
@@ -281,40 +281,12 @@ class CoinpaymentsVpnProvider(ABC):
         time.sleep(2)
         return {'amount': str(amount), 'address': str(address)}
 
-    def pay(self, amount, address, coin_type, wallet):
-        # Pay amount using specified wallet, if there is not
-        # enough balance available print "Not enough balance for
-        # the specified payment"
-
-        print("\nPayment process of "
-              + str(amount)
-              + " of "
-              + str(coin_type)
-              + " to "
-              + str(address)
-              + " started")
-        if coin_type == 'BTC':
-            print("\nConnecting to bitcoin wallet")
-            print("\nChecking Balance...")
-            fee = B_wallet_util.get_network_fee()
-        elif coin_type == 'ETH':
-            print("\nConnecting to Ethereum Wallet...")
-            print("\nChecking Balance...")
-            fee = e_wallet_util.get_network_fee()
-        print(('Calculated fee: %s' % fee))
-        if wallet.get_balance() >= fee + float(amount):
-            transaction_hash = wallet.pay(address, amount, fee)
-            print('Done purchasing')
-            return transaction_hash
-        else:
-            print(" Not enough " + str(coin_type))
-
     def save_login_after_purchase(self):
         username = self.user_used_for_payment['email']
         password = self.user_used_for_payment['password']
         # save the login parameter so these can be used by the
         # VPN installation script in the Utilities
-        full_file_path = self.save_user_login_file
+        full_file_path = self.saveUserLoginFile
         file_contents = username + "\n" + password
         tempfile = open(full_file_path, 'w')
         tempfile.write(file_contents)
