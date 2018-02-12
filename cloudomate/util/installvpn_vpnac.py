@@ -258,7 +258,8 @@ class InstallVpnac:
                               + self.service_auth_active_until)
         if temphref == 'not set':
             print("\n\nhref >???????????? No Active vpn service found. "
-                  "Perhaps it expired? \n")
+                  "Perhaps it expired? Or you havent putrchased any?\n")
+            exit(0)
 
         # Goes to the page containing VPN user info needed for openvpn
         vpn_info_url = self.BASE_URL + temphref
