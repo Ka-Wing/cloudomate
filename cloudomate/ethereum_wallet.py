@@ -235,7 +235,7 @@ class Wallet(object):
         amount_in_wei = self.web3.toWei(amount, "ether") 
         fee_in_wei = self.web3.toWei(fee, "gwei")
 	
-        if(self.web3.eth.get_balance(self.address) >=
+        if(self.web3.eth.getBalance(self.address) >=
                    amount_in_wei + fee_in_wei):
             tx = Transaction(
             nonce = nonce_address,
