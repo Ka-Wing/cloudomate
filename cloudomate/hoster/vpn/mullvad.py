@@ -133,7 +133,7 @@ class MullVad(VpnHoster):
         page_url = self._browser.get_url()
 
         # Check if registration was successful
-        while page_url == self.REGISTER_URL:
+        while str(page_url) == self.REGISTER_URL:
             # Solve captcha
             captcha_solver = CaptchaSolver(captchakey)
             solution = captcha_solver.solve_captcha_text_case_sensitive(
@@ -144,8 +144,6 @@ class MullVad(VpnHoster):
                 self._browser.get_url()
 
             page = self._browser.submit_selected()
-            print(self.REGISTER_URL)
-            print(page.url)
             page_url = page.url
 
         # Delete image

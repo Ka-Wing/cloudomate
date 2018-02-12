@@ -51,7 +51,9 @@ class Settings(object):
         try:
             if append:
                 self.settings.write(
-                    open("\n" + filename, 'a', encoding='utf-8'))
+                    open("\n", 'a', encoding='utf-8'))
+                self.settings.write(
+                    open(filename, 'a', encoding='utf-8'))
             else:
                 self.settings.write(open(filename, 'w', encoding='utf-8'))
         except IOError:
