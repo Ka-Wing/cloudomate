@@ -220,8 +220,9 @@ class MullVad(VpnHoster):
         # self._login()
         soup = self._browser.get_current_page()
         expire_date = soup.select(".balance-header")[0].get_text()
-        print(expire_date.split("\n")[1].strip())
+        print(expire_date.split("\n")[1].strip(), end=' ')
         expire_date = expire_date.split("\n")[2]
+        print(expire_date.strip())
         index_before_date = expire_date.index("in")
         index_after_date = expire_date.index("days")
         expire_date = \

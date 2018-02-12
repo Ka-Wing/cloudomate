@@ -155,6 +155,10 @@ def add_vpn_status(subparsers):
             "vpn-status",
             help="Returns provider name of active VPN service if any.")
     parser_vpn_status.set_defaults(func=vpn_status)
+    parser_vpn_status.add_argument(
+        "--provider",
+        help="The specified provider",
+        choices=providers['vpn'])
 
 
 def add_vpn_turn_on(subparsers):
@@ -860,8 +864,10 @@ def vpn_subscription_status(args):
 
 # Get the expiration date of mullvad
 def vpn_subscription_status_mullvad():
-    m = MullVad()
-    print(m.get_status())
+    settings = Settings()
+    settings.read_settings()
+    m = MullVad(settings)
+    m.get_status()
 
 
 # Checks whether the VPN service is turned on or off.
