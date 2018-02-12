@@ -19,7 +19,7 @@ from cloudomate.hoster.vpn.vpn_hoster \
     import VpnHoster, VpnOption, VpnStatus, VpnConfiguration
 from cloudomate.util.captchasolver import CaptchaSolver
 from cloudomate.util.captcha_account_manager \
-    import captchaAccountManager
+    import CaptchaAccountManager
 
 standard_library.install_aliases()
 
@@ -114,7 +114,7 @@ class MullVad(VpnHoster):
     def _register(self):
         # Check if account is in configuration file
         try:
-            captchakey = captchaAccountManager().get_api_key()
+            captchakey = CaptchaAccountManager().get_api_key()
         except KeyError:
             print("Error: Anti Captcha account not found, "
                   "please register one!")

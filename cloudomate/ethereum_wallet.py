@@ -42,7 +42,8 @@ print(my_wallet.get_balance())
 
 Give the amount and ethereum address for the transaction:
 address_to_send_eth = input("Please enter an address to send eth :")	
-user_amount = float(input("Please provide an amount to send (in ether) : "))
+user_amount = float(input("Please provide an amount to send 
+(in ether) : "))
 
 Make a payment with ethereum:
 tx_hash = my_wallet.pay(address_to_send_eth, user_amount)
@@ -50,6 +51,7 @@ print("Your txHash is :" + str(tx_hash))
 """
 
 NB_GAS_FOR_TRANSACTION = 100000
+
 
 def determine_currency(text):
     """
@@ -64,6 +66,7 @@ def determine_currency(text):
         return "EUR"
     else:
         return None
+
 
 def get_rate(currency="USD"):
     """
@@ -80,6 +83,7 @@ def get_rate(currency="USD"):
     
     return 1.0 / factor
 
+
 def get_rates(currencies):
     """
     Return rates for all currencies to ETH.
@@ -87,6 +91,7 @@ def get_rates(currencies):
     """
     rates = {cur: get_rate(cur) for cur in currencies}
     return rates
+
 
 def get_price(amount, currency="USD"):
     """
@@ -98,7 +103,9 @@ def get_price(amount, currency="USD"):
     price = amount * get_rate(currency)
     return price
 
-def get_network_fee(): # with web3.py he gives 520 gwei which is too much
+
+# with web3.py he gives 520 gwei which is too much
+def get_network_fee():
     """
     Give an estimate of network fee for a simple ether transaction.
     from http://gasprice.dopedapp.com/
@@ -114,10 +121,10 @@ def get_network_fee(): # with web3.py he gives 520 gwei which is too much
 class Wallet(object):
     """
     Wallet implements an adapter to the wallet handler.
-    Currently Wallet only supports electrum wallets without passwords for 
-    automated operation.
-    Wallets with passwords may still be used, but passwords will have to be 
-    entered manually.
+    Currently Wallet only supports electrum wallets without passwords
+    for automated operation.
+    Wallets with passwords may still be used, but passwords will
+    have to be entered manually.
     """
     def create_private_key(self):
         """
@@ -126,6 +133,7 @@ class Wallet(object):
         
         private_key = encode_hex(sha3(os.urandom(4096)))
         return private_key
+
 
     def get_infura_node(self):
         """
@@ -136,6 +144,7 @@ class Wallet(object):
         
         return eth_provider
 
+
     def get_infura_ropsten_node(self):
         """
         To get an access to the infura service, test network
@@ -145,41 +154,46 @@ class Wallet(object):
         
         return eth_provider
 
+
     def __init__(self, private_key=None,
                  eth_provider=None):
         """
-        You need to provide a private key (to sign a transaction) and a node 
-        provider (to allow sending of transactions on the network).
+        You need to provide a private key (to sign a transaction)
+        and a node provider (to allow sending of transactions
+        on the network).
 	
         Example
 
         ## Main Network ##
 
-        web3 = Web3(HTTPProvider('localhost:8545')) # need a local node, light 
-        node doesn't work  and not enough space for full node
+        web3 = Web3(HTTPProvider('localhost:8545')) # need a local node,
+        light node doesn't work  and not enough space for full node
 
-        web3 = Web3(HTTPProvider('https://api.myetherapi.com/eth')) # doesn't 
-        work, 403 error
+        web3 = Web3(HTTPProvider('https://api.myetherapi.com/eth'))
+        # doesn't work, 403 error
 	
-        web3 = Web3(HTTPProvider('https://mainnet.infura.io/YOUR_API_KEY'))
+        web3 =
+        Web3(HTTPProvider('https://mainnet.infura.io/YOUR_API_KEY'))
 
         ## Ropsten ##
 
-        web3 = Web3(HTTPProvider('https://api.myetherapi.com/rop')) # for 
-        Ropsten network, doesn't work
+        web3 = Web3(HTTPProvider('https://api.myetherapi.com/rop'))
+        # for Ropsten network, doesn't work
 	
-        web3 = Web3(HTTPProvider('https://ropsten.infura.io/YOUR_API_KEY')) 
-	"""
+        web3 =
+        Web3(HTTPProvider('https://ropsten.infura.io/YOUR_API_KEY'))
+	    """
         if private_key is None:
-            save_to =  os.path.expanduser("~") + "/.config/ethereum_wallet_id.cfg"
+            save_to = os.path.expanduser("~") \
+                      + "/.config/ethereum_wallet_id.cfg"
             if os.path.isfile(save_to) is False:
                 # doesn't exist
                 private_key = self.create_private_key()
-                with open(save_to,'w') as f:
+                with open(save_to, 'w') as f:
                     f.write(private_key)
             else:
                 # exists
-                with open(save_to,'r') as f:
+                with open(save_to, 'r') as f:
                     private_key = f.read()
 	
         if eth_provider is None:
@@ -216,11 +230,13 @@ class Wallet(object):
         assert self.web3.isConnected()
         nonce_address = self.web3.eth.getTransactionCount(self.address)
         assert self.web3.isAddress(address_to_send)
-	
+
+        # 1 Gwei = 1 billion wei
         amount_in_wei = self.web3.toWei(amount, "ether") 
-        fee_in_wei = self.web3.toWei(fee, "gwei") # 1 Gwei = 1 billion wei
+        fee_in_wei = self.web3.toWei(fee, "gwei")
 	
-        if(self.web3.eth.get_balance(self.address) >= amount_in_wei + fee_in_wei):
+        if(self.web3.eth.get_balance(self.address) >=
+                   amount_in_wei + fee_in_wei):
             tx = Transaction(
             nonce = nonce_address,
             gasprice = fee_in_wei, 
@@ -239,10 +255,12 @@ class Wallet(object):
 
     def getTransactionStatus(self, txHash):
         #transaction_Infos = self.web3.eth.getTransaction(txHash)
-        transaction_Receipt = self.web3.eth.getTransactionReceipt(txHash)
+        transaction_Receipt = \
+            self.web3.eth.getTransactionReceipt(txHash)
         
         if transaction_Receipt is None:
-            return "Transaction not found on the Ethereum Blockchain, maybe it is not yet mined"
+            return "Transaction not found on the Ethereum " \
+                   "Blockchain, maybe it is not yet mined"
         elif transaction_Receipt['status'] is 0:
             return "Error"
         elif transaction_Receipt['status'] is 1:
@@ -252,7 +270,8 @@ def main():
     #test = Wallet(eth_provider=Wallet.get_infura_ropsten_node())
     test = Wallet()
     print(str(test.get_balance()))
-    #print(test.getTransactionStatus("0x2d8037b04efb170660820771e0f649deb55ca5ff0e3b4c36033f59d2a61456fe"))
+    #print(test.getTransactionStatus(
+    # "0x2d8037b04efb170660820771e0f649deb55ca5ff0e3b4c36033f59d2a61456fe"))
     #print(test.pay("0x30a5301353150B96D16f4e40562351FE18EEE423",0.000001))
     txHash = test.pay("0x30a5301353150B96D16f4e40562351FE18EEE423",0.00001)
     print(txHash)

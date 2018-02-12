@@ -10,7 +10,7 @@ import time
 #from cloudomate import ethereum_wallet as E_wallet_util
 import os
 
-class vpnacVPNPurchaser(CoinpaymentsVpnProvider):
+class VpnacVPNPurchaser(CoinpaymentsVpnProvider):
 
     PURCHASE_URL = 'https://vpn.ac/vpn-accounts'
     COINPAYMENTS_URL = 'https://www.coinpayments.net/index.php?cmd=checkout'
@@ -74,7 +74,7 @@ class vpnacVPNPurchaser(CoinpaymentsVpnProvider):
 
 
 if __name__ == '__main__':
-    vpnac = vpnacVPNPurchaser()
+    vpnac = VpnacVPNPurchaser()
     user_settings = {"email": "mohamestest232westesttest@gmail.com", "password": "sfdjlsdmfsdlfkTest_12312", "registered": "1"}
     vpnac.retrieve_ethereum(user_settings)
     # b = vpnac.retrieve_ethereum(user_settings)

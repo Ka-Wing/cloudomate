@@ -21,8 +21,8 @@ from cloudomate import wallet as bitcoin_wallet_util
 from cloudomate.hoster.vpn.azirevpn import AzireVpn
 from cloudomate.hoster.vpn.mullvad import MullVad
 from cloudomate.util.installvpn_mullvad import InstallMullvad
-from cloudomate.hoster.vpn.vpnac_purchase import vpnacVPNPurchaser
-from cloudomate.hoster.vpn.torguard_purchase import torguardVPNPurchaser
+from cloudomate.hoster.vpn.vpnac_purchase import VpnacVPNPurchaser
+from cloudomate.hoster.vpn.torguard_purchase import TorguardVPNPurchaser
 from cloudomate.hoster.vps.blueangelhost import BlueAngelHost
 from cloudomate.hoster.vps.ccihosting import CCIHosting
 from cloudomate.hoster.vps.crowncloud import CrownCloud
@@ -33,23 +33,27 @@ from cloudomate.util.fakeuserscraper import UserScraper
 from cloudomate.util.settings import Settings
 from cloudomate.wallet import Wallet as bitcoin_wallet
 
-import re
 import time
 from cloudomate import ethereum_wallet as E_wallet_util
 from cloudomate.ethereum_wallet import Wallet as EthereumWallet
-from cloudomate.hoster.vpn.vpnac_purchase import vpnacVPNPurchaser
-from cloudomate.hoster.vpn.torguard_purchase import torguardVPNPurchaser
-from cloudomate.util.installvpn_torguard import installVpnTorguard
-from cloudomate.util.installvpn_vpnac import installVpnAC
+from cloudomate.hoster.vpn.vpnac_purchase import VpnacVPNPurchaser
+from cloudomate.hoster.vpn.torguard_purchase import TorguardVPNPurchaser
+from cloudomate.util.installvpn_torguard import InstallVpnTorguard
+from cloudomate.util.installvpn_vpnac import InstallVpnac
 from cloudomate.util.vpn_status_monitor import VpnStatusMonitor
-from cloudomate.util.captcha_account_manager import captchaAccountManager
-from cloudomate.util.agent_notification_manager import AgentNotificationManager
+from cloudomate.util.captcha_account_manager \
+    import CaptchaAccountManager
+from cloudomate.util.agent_notification_manager \
+    import AgentNotificationManager
 
 standard_library.install_aliases()
 
 
 def _map_providers_to_dict(provider_list):
-    return CaseInsensitiveDict(dict((provider.get_metadata()[0], provider) for provider in provider_list))
+    return CaseInsensitiveDict(
+        dict(
+            (provider.get_metadata()[0], provider)
+            for provider in provider_list))
 
 
 types = ["vps", "vpn"]
@@ -66,8 +70,8 @@ providers = CaseInsensitiveDict({
     "vpn": _map_providers_to_dict([
         AzireVpn,
         MullVad,
-        vpnacVPNPurchaser,
-        torguardVPNPurchaser,
+        VpnacVPNPurchaser,
+        TorguardVPNPurchaser,
     ])
 })
 
@@ -92,159 +96,294 @@ def execute(cmd=sys.argv[1:]):
     args = parser.parse_args(cmd)
     args.func(args)
 
+
 def add_vpn_purchase(subparsers):
-    parser_purchase = subparsers.add_parser("vpn-purchase", help="Purchase VPN")
+    parser_purchase = subparsers.add_parser(
+        "vpn-purchase",
+        help="Purchase VPN")
     parser_purchase.set_defaults(func=vpn_purchase)
-    parser_purchase.add_argument("--provider", help="The specified provider", choices=providers['vpn'])
-    parser_purchase.add_argument("-c","--coin", help="Choose the cryptocurrency used for purchasing.")
-    parser_purchase.add_argument("-fm", "--feemultiplier", help="Choose the fee used for purchasing.")
-    parser_purchase.add_argument("-a", "--accountnr", help="Choose the cryptocurrency used for purchasing.")
-    parser_purchase.add_argument("-un", "--username", help="Choose the username.")
-    parser_purchase.add_argument("-pw", "--password", help="Choose the password.")
-    parser_purchase.add_argument("-r", help="Given username is already registered.", action="store_true")
-    parser_purchase.add_argument("-f", help="Don't prompt for user confirmation", dest="noconfirm", action="store_true")
+    parser_purchase.add_argument(
+        "--provider",
+        help="The specified provider", choices=providers['vpn'])
+    parser_purchase.add_argument(
+        "-c",
+        "--coin",
+        help="Choose the cryptocurrency used for purchasing.")
+    parser_purchase.add_argument(
+        "-fm",
+        "--feemultiplier",
+        help="Choose the fee used for purchasing.")
+    parser_purchase.add_argument(
+        "-a",
+        "--accountnr",
+        help="Choose the cryptocurrency used for purchasing.")
+    parser_purchase.add_argument(
+        "-un",
+        "--username",
+        help="Choose the username.")
+    parser_purchase.add_argument(
+        "-pw",
+        "--password",
+        help="Choose the password.")
+    parser_purchase.add_argument(
+        "-r",
+        help="Given username is already registered.",
+        action="store_true")
+    parser_purchase.add_argument(
+        "-f",
+        help="Don't prompt for user confirmation",
+        dest="noconfirm",
+        action="store_true")
+
 
 def add_vpn_subscription_status(subparsers):
-    parser_subscription_status = subparsers.add_parser("vpn-subscription-status", help="Check status of the subscription of the VPN service")
-    parser_subscription_status.set_defaults(func=vpn_subscription_status)
-    parser_subscription_status.add_argument("--provider", help="The specified provider", choices=providers['vpn'])
+    parser_subscription_status = \
+        subparsers.add_parser(
+            "vpn-subscription-status",
+            help="Check status of the subscription of the VPN service")
+    parser_subscription_status.set_defaults(
+        func=vpn_subscription_status)
+    parser_subscription_status.add_argument(
+        "--provider",
+        help="The specified provider",
+        choices=providers['vpn'])
+
 
 def add_vpn_status(subparsers):
-    parser_vpn_status = subparsers.add_parser("vpn-status", help="Returns provider name of active VPN service if any.")
+    parser_vpn_status = \
+        subparsers.add_parser(
+            "vpn-status",
+            help="Returns provider name of active VPN service if any.")
     parser_vpn_status.set_defaults(func=vpn_status)
 
+
 def add_vpn_turn_on(subparsers):
-    parser_turn_on = subparsers.add_parser("vpn-turn-on", help="Turn on specified VPN service.")
+    parser_turn_on = \
+        subparsers.add_parser(
+            "vpn-turn-on",
+            help="Turn on specified VPN service.")
     parser_turn_on.set_defaults(func=vpn_turn_on)
-    parser_turn_on.add_argument("--provider", help="The specified provider", choices=providers['vpn'])
-    parser_turn_on.add_argument("-c", "--country", help="The location of the server through which you would like to "
-                                                         "router traffic")
-    parser_turn_on.add_argument("-p", "--protocol", help="The protocol.")
+    parser_turn_on.add_argument(
+        "--provider",
+        help="The specified provider",
+        choices=providers['vpn'])
+    parser_turn_on.add_argument(
+        "-c",
+        "--country",
+        help="The location of the server through which you "
+             "would like to router traffic")
+    parser_turn_on.add_argument(
+        "-p",
+        "--protocol",
+        help="The protocol.")
+
 
 def add_vpn_turn_off(subparsers):
-    parser_turn_off = subparsers.add_parser("vpn-turn-off", help="Turn off active VPN services.")
+    parser_turn_off = \
+        subparsers.add_parser(
+            "vpn-turn-off",
+            help="Turn off active VPN services.")
     parser_turn_off.set_defaults(func=vpn_turn_off)
-    #parser_turn_off.add_argument("provider", help="The specified provider", choices=providers['vpn'])
+
 
 def add_agent_status_notifier(subparser):
-    parser_captcha = subparser.add_parser("agent-status-notifier", help="Status notifier of agent.")
+    parser_captcha = \
+        subparser.add_parser(
+            "agent-status-notifier",
+            help="Status notifier of agent.")
     parser_captcha.set_defaults(type="agent_status_notifier")
-    subparser_captcha = parser_captcha.add_subparsers(dest="command") #, help="Get account details"
+    subparser_captcha = \
+        parser_captcha.add_subparsers(dest="command")
     subparser_captcha.required = True
 
-    status_parser = subparser_captcha.add_parser("status", help ="Get status of the notifier")
+    status_parser = \
+        subparser_captcha.add_parser(
+            "status",
+            help="Get status of the notifier")
     status_parser.set_defaults(func=notifier_status)
 
-    turnon_parser = subparser_captcha.add_parser("turnon", help ="Turn on the status notifier")
+    turnon_parser = \
+        subparser_captcha.add_parser(
+            "turnon",
+            help="Turn on the status notifier")
     turnon_parser.set_defaults(func=turnon_notifier)
-    turnon_parser.add_argument("--minutes", help="Amount of minutes.", type=int)
-    turnon_parser.add_argument("--recipient", help="Address where to send the email to")
+    turnon_parser.add_argument(
+        "--minutes",
+        help="Amount of minutes.",
+        type=int)
+    turnon_parser.add_argument(
+        "--recipient",
+        help="Address where to send the email to")
 
-    turnoff_parser = subparser_captcha.add_parser("turnoff", help="Turn off the status notifier.")
+    turnoff_parser = \
+        subparser_captcha.add_parser(
+            "turnoff",
+            help="Turn off the status notifier.")
     turnoff_parser.set_defaults(func=turnoff_notifier)
 
 
 def add_captcha_manager(subparser):
-    parser_captcha = subparser.add_parser("captcha-manager", help="Manager of the captcha account.")
+    parser_captcha = \
+        subparser.add_parser(
+            "captcha-manager",
+            help="Manager of the captcha account.")
     parser_captcha.set_defaults(type="captcha_manager")
-    subparser_captcha = parser_captcha.add_subparsers(dest="command")
+    subparser_captcha = \
+        parser_captcha.add_subparsers(dest="command")
     subparser_captcha.required = True
 
-    view_amount_parser = subparser_captcha.add_parser("view-account", help ="Get account details")
+    view_amount_parser = \
+        subparser_captcha.add_parser(
+            "view-account",
+            help="Get account details")
     view_amount_parser.set_defaults(func=captcha_view_account)
 
-    get_balance_parser = subparser_captcha.add_parser("get-balance", help ="Get current balance")
+    get_balance_parser = \
+        subparser_captcha.add_parser(
+            "get-balance",
+            help="Get current balance")
     get_balance_parser.set_defaults(func=captcha_get_balance)
 
-    reload_parser = subparser_captcha.add_parser("reload", help="Top up balance for anticaptcha account.")
-    reload_parser.add_argument("--amount", help="The amount to top up in US Dollars.", type=int)
-    reload_parser.add_argument("-c", "--coin", help="The cryptocurrency to pay with.", default="btc")
-    reload_parser.add_argument("-fm", "--feemultiplier", help="Choose the fee used for purchasing.")
+    reload_parser = \
+        subparser_captcha.add_parser(
+            "reload",
+            help="Top up balance for anticaptcha account.")
+    reload_parser.add_argument(
+        "--amount",
+        help="The amount to top up in US Dollars.",
+        type=int)
+    reload_parser.add_argument(
+        "-c",
+        "--coin",
+        help="The cryptocurrency to pay with.",
+        default="btc")
+    reload_parser.add_argument(
+        "-fm",
+        "--feemultiplier",
+        help="Choose the fee used for purchasing.")
     reload_parser.set_defaults(func=captcha_reload)
     pass
 
-#PHILIP
+
+# PHILIP
 def turnon_notifier(args):
     agent_status_notifier = AgentNotificationManager()
-    if args.recipient != None:
+    if args.recipient is not None:
         agent_status_notifier.isValidEmail(args.recipient)
-        if args.minutes == None: agent_status_notifier.doNotifyEveryXMinutes(mailTo=args.recipient)
-        else: agent_status_notifier.doNotifyEveryXMinutes(everyXminute=args.minutes, mailTo=args.recipient)
+        if args.minutes is None:
+            agent_status_notifier.doNotifyEveryXMinutes(
+                mailTo=args.recipient)
+        else:
+            agent_status_notifier.doNotifyEveryXMinutes(
+            everyXminute=args.minutes, mailTo=args.recipient)
     else:
-        if args.minutes != None: agent_status_notifier.doNotifyEveryXMinutes(everyXminute=args.minutes)
+        if args.minutes is not None:
+            agent_status_notifier.doNotifyEveryXMinutes(
+                everyXminute=args.minutes)
         else: 
             agent_status_notifier.doNotifyEveryXMinutes()
 
-#PHILIP
+
+# PHILIP
 def turnoff_notifier(args):
     agent_status_notifier = AgentNotificationManager()
     agent_status_notifier.turnOffAutoNotify()
 
-#PHILIP
+
+# PHILIP
 def notifier_status(args):
     agent_status_notifier = AgentNotificationManager()
-    if agent_status_notifier.autoNotifyIsOn() == True:
+    if agent_status_notifier.autoNotifyIsOn():
         print("active")
     else:
         print("not active")
 
-#PHILIP
-def captcha_get_balance(args):
-    c_Manager = captchaAccountManager()
-    print("\n\nBalance captcha- account: " + str(c_Manager.get_balance()) + "\n\n")
 
-#PHILIP
+# PHILIP
+def captcha_get_balance(args):
+    captcha_manager = CaptchaAccountManager()
+    print("\n\nBalance captcha- account: "
+          + str(captcha_manager.get_balance())
+          + "\n\n")
+
+
+# PHILIP
 def captcha_reload(args):
     amount_to_use = args.amount
-    if amount_to_use == None:
+    if amount_to_use is None:
         amount_to_use = 10
         print("\namount not given, using standard value of $10..")
     elif not args.amount >= 1:
         print("Amount must be at least $1")
         exit(0)
-    c_Manager = captchaAccountManager()
-    c_Manager.reload_account(amount_to_use)
+    captcha_manager = CaptchaAccountManager()
+    captcha_manager.reload_account(amount_to_use)
 
-#PHILIP
+
+# PHILIP
 def captcha_view_account(args):
-    c_Manager = captchaAccountManager()
-    user_login = c_Manager.get_anticaptcha_account_login()
+    captcha_manager = CaptchaAccountManager()
+    user_login = captcha_manager.get_anticaptcha_account_login()
     print("\n\nUsername: " + user_login['username'])
     print("Password: " + user_login['password'])
-    print("Current API KeY: " + c_Manager.get_api_key() + "\n\n")
+    print("Current API KeY: " + captcha_manager.get_api_key() + "\n\n")
 
-#TODO PHILIP
+
+# TODO PHILIP
 def vpnac_purchase_handler(args):
     print("\n\n_________________VPN PURCHASE VPNAC_______________")
 
     use_coin = 'BTC'
-    if args.r == True:
-        if args.password == None:
-            print("\n\n -r option suggests that your email is already registered, therefore you would need to provide a --password, use 'Test_12345_Test_12345' if your password was automatically generated\n\n")
+    if args.r is True:
+        if args.password is None:
+            print("\n\n -r option suggests that your email is already "
+                  "registered, therefore you would need to provide a "
+                  "--password, use 'Test_12345_Test_12345' if your "
+                  "password was automatically generated\n\n")
             exit(0)
-    if args.username == None:
-        print("\nplease provide an email with wich you would like to purchase VPNAC-VPN using --username option")
+    if args.username is None:
+        print("\nplease provide an email with wich you would "
+              "like to purchase VPNAC-VPN using --username option")
         exit(0)
-    if args.coin == None:
-        print("\n\nPreferred coin not specified, automatically set to bitcoin")
-    elif args.coin == 'ETH' or args.coin == 'BTC': use_coin = args.coin
+    if args.coin is None:
+        print("\n\nPreferred coin not specified, "
+              "automatically set to bitcoin")
+    elif args.coin == 'ETH' or args.coin == 'BTC':
+        use_coin = args.coin
     else:
-        print("\n\nNo wallet for: '" + args.coin + "' implemented, Coin type " + args.coin + " currently not supported")
-        print("\n\nPlease provide a valid coin type: currently ETH or BTC are currently supported\n\n")
+        print(
+            "\n\nNo wallet for: '"
+            + args.coin
+            + "' implemented, Coin type "
+            + args.coin
+            + " currently not supported")
+        print(
+            "\n\nPlease provide a valid coin type: "
+            "currently ETH or BTC are currently supported\n\n")
         exit(0)
 
-    if args.feemultiplier == None:
-        if use_coin == 'ETH': print("\n\nNo fee multiplier specified using ETHEREUM standard fee of: " + str(E_wallet_util.get_network_fee()))
-        elif use_coin == 'BTC': print("\n\nNo fee multiplier specified using BITCOIN standard fee of: " + str(bitcoin_wallet_util.get_network_fee()))
+    if args.feemultiplier is None:
+        if use_coin == 'ETH':
+            print("\n\nNo fee multiplier specified using "
+                  "ETHEREUM standard fee of: "
+                  + str(E_wallet_util.get_network_fee()))
+        elif use_coin == 'BTC':
+            print("\n\nNo fee multiplier specified using "
+                  "BITCOIN standard fee of: "
+                  + str(bitcoin_wallet_util.get_network_fee()))
 
-    #TODO: pay with ether
+    # TODO: pay with ether
     return
-    vpnac = vpnacVPNPurchaser()
-    user_settings = {"email": args.username, "password": args.password, "registered": "0"}
-    if args.r == True: user_settings["registered"] = '1'
+    vpnac = VpnacVPNPurchaser()
+    user_settings = {
+        "email": args.username,
+        "password": args.password,
+        "registered": "0"}
+    if args.r:
+        user_settings["registered"] = '1'
 
     b = None
-    #vpnac.retrieve_ethereum(user_settings)
+    # vpnac.retrieve_ethereum(user_settings)
     if use_coin == 'BTC':
         b = vpnac.retrieve_bitcoin(user_settings)
     elif use_coin == 'ETH':
@@ -255,67 +394,100 @@ def vpnac_purchase_handler(args):
     print("\n\nstarting payment process...")
     if args.coin == 'ETH':
         ethwallet = EthereumWallet()
-        if args.feemultiplier != None:
-            fee = int(float(args.feemultiplier))*float(E_wallet_util.get_network_fee())
-            print("\nFee being multiplied by " + args.feemultiplier + ", \ncurrent AVG fee: " + str(E_wallet_util.get_network_fee()) + "Gwei \nyour fee: " + str(fee))
-            txhash = ethwallet.pay(b['address'],b['amount'],fee)
-            print("\nYour transactionhash: " + str(txhash))
-            print("\n\nAwaiting payment conformation for current transaction hash... re-checking in 30 sec..")
+        if args.feemultiplier is not None:
+            fee = int(float(args.feemultiplier))\
+                  * float(E_wallet_util.get_network_fee())
+            print("\nFee being multiplied by "
+                  + args.feemultiplier
+                  + ", \ncurrent AVG fee: "
+                  + str(E_wallet_util.get_network_fee())
+                  + "Gwei \nyour fee: "
+                  + str(fee))
+            txhash = ethwallet.pay(b['address'], b['amount'], fee)
+            print("\nYour transactionhash: "
+                  + str(txhash))
+            print("\n\nAwaiting payment conformation for "
+                  "current transaction hash... re-checking in 30 sec..")
             time.sleep(30)
             txstatus = ethwallet.getTransactionStatus(txhash)
             while txstatus != "Success":
-                print("\n\nAwaiting payment conformation for current transaction hash... re-checking in 30 sec..")
+                print("\n\nAwaiting payment conformation for current "
+                      "transaction hash... re-checking in 30 sec..")
                 time.sleep(30)
                 txstatus = ethwallet.getTransactionStatus(txhash)
                 if txstatus == "Error":
                     print("\n\nTransaction seems to have failed...")
                     exit(0)
             print("\n\nTransaction has finished succesfully!...")
-            vpnac.saveLoginAfterPurchase()
+            vpnac.save_login_after_purchase()
         else:
-            txhash = ethwallet.pay(b['address'],b['amount'])
+            txhash = ethwallet.pay(b['address'], b['amount'])
             print("\nYour transactionhash: " + str(txhash))
-            print("\n\nAwaiting payment conformation for current transaction hash... re-checking in 30 sec..")
+            print("\n\nAwaiting payment conformation for current "
+                  "transaction hash... re-checking in 30 sec..")
             time.sleep(30)
             txstatus = ethwallet.getTransactionStatus(txhash)
             while txstatus != "Success":
-                print("\n\nAwaiting payment conformation for current transaction hash... re-checking in 30 sec..")
+                print("\n\nAwaiting payment conformation for current "
+                      "transaction hash... re-checking in 30 sec..")
                 time.sleep(30)
                 txstatus = ethwallet.getTransactionStatus(txhash)
                 if txstatus == "Error":
                     print("\n\nTransaction seems to have failed...")
                     exit(0)
             print("\n\nTransaction has finished succesfully!...")
-            vpnac.saveLoginAfterPurchase()
+            vpnac.save_login_after_purchase()
 
-#TODO PHILIP
+
+# TODO PHILIP
 def torguard_purchase_handler(args):
     print("\n\n_________________VPN PURCHASE TORGUARD_______________")
 
     use_coin = 'BTC'
-    if args.r == True:
-        if args.password == None:
-            print("\n\n -r option suggests that your email is already registered, therefore you would need to provide a --password, use 'Test_12345_Test_12345' if your password was automatically generated\n\n")
+    if args.r:
+        if args.password is None:
+            print("\n\n -r option suggests that your email is already "
+                  "registered, therefore you would need to provide a "
+                  "--password, use 'Test_12345_Test_12345' "
+                  "if your password was automatically generated\n\n")
             exit(0)
-    if args.username == None:
-        print("\nplease provide an email with wich you would like to purchase VPNAC-VPN using --username option")
+    if args.username is None:
+        print("\nplease provide an email with wich you would like to "
+              "purchase VPNAC-VPN using --username option")
         exit(0)
-    if args.coin == None:
-        print("\n\nPreferred coin not specified, automatically set to bitcoin")
-    elif args.coin == 'ETH' or args.coin == 'BTC': use_coin = args.coin
+    if args.coin is None:
+        print("\n\nPreferred coin not specified, "
+              "automatically set to bitcoin")
+    elif args.coin == 'ETH' or args.coin == 'BTC':
+        use_coin = args.coin
     else:
-        print("\n\nNo wallet for: '" + args.coin + "' implemented, Coin type " + args.coin + " currently not supported")
-        print("\n\nPlease provide a valid coin type: currently ETH or BTC are currently supported\n\n")
+        print("\n\nNo wallet for: '"
+              + args.coin
+              + "' implemented, Coin type "
+              + args.coin
+              + " currently not supported")
+        print("\n\nPlease provide a valid coin type: "
+              "currently ETH or BTC are currently supported\n\n")
         exit(0)
 
-    if args.feemultiplier == None:
-        if use_coin == 'ETH': print("\n\nNo fee multiplier specified using ETHEREUM standard fee of: " + str(E_wallet_util.get_network_fee()))
-        elif use_coin == 'BTC': print("\n\nNo fee multiplier specified using BITCOIN standard fee of: " + str(bitcoin_wallet_util.get_network_fee()))
+    if args.feemultiplier is None:
+        if use_coin == 'ETH':
+            print("\n\nNo fee multiplier specified using ETHEREUM "
+                  "standard fee of: "
+                  + str(E_wallet_util.get_network_fee()))
+        elif use_coin == 'BTC':
+            print("\n\nNo fee multiplier specified using BITCOIN "
+                  "standard fee of: "
+                  + str(bitcoin_wallet_util.get_network_fee()))
 
-    #TODO: pay with ether
-    torguard = torguardVPNPurchaser()
-    user_settings = {"email": args.username, "password": args.password, "registered": "0"}
-    if args.r == True: user_settings["registered"] = '1'
+    # TODO: pay with ether
+    torguard = TorguardVPNPurchaser()
+    user_settings = {
+        "email": args.username,
+        "password": args.password,
+        "registered": "0"}
+    if args.r:
+        user_settings["registered"] = '1'
 
     b = None
 
@@ -330,78 +502,101 @@ def torguard_purchase_handler(args):
     print("\n\nstarting payment process...")
     if args.coin == 'ETH':
         ethwallet = EthereumWallet()
-        if args.feemultiplier != None:
-            fee = int(float(args.feemultiplier))*float(E_wallet_util.get_network_fee())
-            print("\nFee being multiplied by " + args.feemultiplier + ", \ncurrent AVG fee: " + str(E_wallet_util.get_network_fee()) + "Gwei \nyour fee: " + str(fee))
-            txhash = ethwallet.pay(b['address'],b['amount'],fee)
+        if args.feemultiplier is not None:
+            fee = int(float(args.feemultiplier))\
+                  * float(E_wallet_util.get_network_fee())
+            print("\nFee being multiplied by "
+                  + args.feemultiplier
+                  + ", \ncurrent AVG fee: "
+                  + str(E_wallet_util.get_network_fee())
+                  + "Gwei \nyour fee: "
+                  + str(fee))
+            txhash = ethwallet.pay(b['address'], b['amount'], fee)
             print("\nYour transactionhash: " + str(txhash)) 
-            print("\n\nAwaiting payment conformation for current transaction hash... re-checking in 30 sec..")
+            print("\n\nAwaiting payment conformation for "
+                  "current transaction hash... re-checking in 30 sec..")
             time.sleep(30)
             txstatus = ethwallet.getTransactionStatus(txhash)
             while txstatus != "Success":
-                print("\n\nAwaiting payment conformation for current transaction hash... re-checking in 30 sec..")
+                print("\n\nAwaiting payment conformation "
+                      "for current transaction hash... "
+                      "re-checking in 30 sec..")
                 time.sleep(30)
                 txstatus = ethwallet.getTransactionStatus(txhash)
                 if txstatus == "Error":
                     print("\n\nTransaction seems to have failed...")
                     exit(0)
             print("\n\nTransaction has finished succesfully!...")
-            torguard.saveLoginAfterPurchase()
+            torguard.save_login_after_purchase()
         else:
-            txhash = ethwallet.pay(b['address'],b['amount'])
+            txhash = ethwallet.pay(b['address'], b['amount'])
             print("\nYour transactionhash: " + str(txhash))
-            print("\n\nAwaiting payment conformation for current transaction hash... re-checking in 30 sec..")
+            print("\n\nAwaiting payment conformation for "
+                  "current transaction hash... "
+                  "re-checking in 30 sec..")
             time.sleep(30)
             txstatus = ethwallet.getTransactionStatus(txhash)
             while txstatus != "Success":
-                print("\n\nAwaiting payment conformation for current transaction hash... re-checking in 30 sec..")
+                print("\n\nAwaiting payment conformation for "
+                      "current transaction hash... "
+                      "re-checking in 30 sec..")
                 time.sleep(30)
                 txstatus = ethwallet.getTransactionStatus(txhash)
                 if txstatus == "Error":
                     print("\n\nTransaction seems to have failed...")
                     exit(0)
             print("\n\nTransaction has finished succesfully!...")
-            torguard.saveLoginAfterPurchase()
+            torguard.save_login_after_purchase()
 
-#TODO KW DINESH
+
+# TODO KW DINESH
 def mullvad_purchase_handler(args):
     settings = Settings()
     m = MullVad(settings)
     if settings.has_key('client', 'walletpath'):
-        wallet = bitcoin_wallet(wallet_path=settings.get('client', 'walletpath'))
+        wallet = bitcoin_wallet(wallet_path=settings.get(
+            'client', 'walletpath'))
     else:
         wallet = bitcoin_wallet()
-    #try:
-    if args.feemultiplier == None:
-        print("\n\nNo fee multiplier specified using BITCOIN standard fee of: " + str(bitcoin_wallet_util.get_network_fee()))
+    # try:
+    if args.feemultiplier is None:
+        print("\n\nNo fee multiplier specified using "
+              "BITCOIN standard fee of: "
+              + str(bitcoin_wallet_util.get_network_fee()))
         m.purchase(wallet)
     else:
         m.purchase(wallet, fee_multiplier=args.feemultiplier)
-    #except Exception as e:
+    # except Exception as e:
     #    print("Error: Wallet file not found.")
     #    print("Type 'electrum create' to create a new wallet,
     # or provide a path to a wallet with the -w option")
 
+
 def add_wallet(subparsers):
     wallet_parsers = subparsers.add_parser("wallet")
     wallet_parsers.set_defaults(type="wallet")
-    wallet_subparsers = wallet_parsers.add_subparsers(dest="wallet_type")
-    #wallet_subparsers.add_argument("getbalance", help="Get balance of wallet.")
+    wallet_subparsers = \
+        wallet_parsers.add_subparsers(dest="wallet_type")
+    # wallet_subparsers.add_argument(
+    # "getbalance", help="Get balance of wallet.")
     wallet_subparsers.required = True
 
     add_ethereum_wallet(wallet_subparsers)
     add_bitcoin_wallet(wallet_subparsers)
 
+
 def add_ethereum_wallet(subparsers):
     ethereum_parsers = subparsers.add_parser("ethereum")
     ethereum_parsers.set_defaults(type="wallet_type")
-    ethereum_subparsers = ethereum_parsers.add_subparsers(dest="command")
+    ethereum_subparsers = \
+        ethereum_parsers.add_subparsers(dest="command")
     ethereum_subparsers.required = True
 
     add_parser_wallet_getbalance(ethereum_subparsers)
     add_parser_wallet_getaddress(ethereum_subparsers)
     add_parser_wallet_getprivatekey(ethereum_subparsers)
     add_parser_wallet_getfees(ethereum_subparsers)
+
 
 def add_bitcoin_wallet(subparsers):
     bitcoin_parsers = subparsers.add_parser("bitcoin")
@@ -414,23 +609,36 @@ def add_bitcoin_wallet(subparsers):
     add_parser_wallet_getprivatekey(bitcoin_subparsers)
     add_parser_wallet_getfees(bitcoin_subparsers)
 
+
 def add_parser_wallet_getbalance(subparsers):
-    parser_getbalance = subparsers.add_parser("getbalance", help="Get balance of wallet.")
-    parser_getbalance.set_defaults(type="command", func=wallet_getbalance)
+    parser_getbalance = subparsers.add_parser(
+        "getbalance",
+        help="Get balance of wallet.")
+    parser_getbalance.set_defaults(
+        type="command",
+        func=wallet_getbalance)
     pass
+
 
 def add_parser_wallet_getaddress(subparsers):
-    parser_getaddress = subparsers.add_parser("getaddress", help="Get "
-                                                           "address of wallet.")
-    parser_getaddress.set_defaults(type="command",
-                                  func=wallet_getaddress)
+    parser_getaddress = subparsers.add_parser(
+        "getaddress",
+        help="Get address of wallet.")
+    parser_getaddress.set_defaults(
+        type="command",
+        func=wallet_getaddress)
     pass
 
+
 def add_parser_wallet_getprivatekey(subparsers):
-    parser_getprivatekey = subparsers.add_parser("getprivatekey",
-                                             help="Get private key of wallet.")
-    parser_getprivatekey.set_defaults(type="command", func=wallet_getprivatekey)
+    parser_getprivatekey = \
+        subparsers.add_parser("getprivatekey",
+                              help="Get private key of wallet.")
+    parser_getprivatekey.set_defaults(
+        type="command",
+        func=wallet_getprivatekey)
     pass
+
 
 def add_parser_wallet_getfees(subparsers):
     parser_getfees = subparsers.add_parser(
@@ -438,48 +646,60 @@ def add_parser_wallet_getfees(subparsers):
     parser_getfees.set_defaults(type="command", func=wallet_fees)
     pass
 
-#Get (un)confirmed bitcoin wallet balance
+
+# Get(un)confirmed bitcoin wallet balance
 def wallet_getbalance_bitcoin():
     settings = Settings()
     if settings.has_key('client', 'walletpath'):
-        wallet = bitcoin_wallet(wallet_path=settings.get('client', 'walletpath'))
+        wallet = bitcoin_wallet(
+            wallet_path=settings.get('client', 'walletpath'))
     else:
         wallet = bitcoin_wallet()
     try:
-        print("\n\nBitcoin Balance Confirmed: \n" + str(wallet.get_balance_confirmed()))
-        print("\n\nBitcoin Balance Unconfirmed: \n" + str(wallet.get_balance_unconfirmed()))
-    except Exception as e:
+        print("\n\nBitcoin Balance Confirmed: \n"
+              + str(wallet.get_balance_confirmed()))
+        print("\n\nBitcoin Balance Unconfirmed: \n"
+              + str(wallet.get_balance_unconfirmed()))
+    except Exception:
         print("Error: Wallet file not found.")
-        print("Type 'electrum create' to create a new wallet, or provide a path to a wallet with the -w option")
+        print("Type 'electrum create' to create a new wallet, "
+              "or provide a path to a wallet with the -w option")
 
-#Get bitcoin wallet addresses
+
+# Get bitcoin wallet addresses
 def wallet_getaddress_bitcoin():
     settings = Settings()
     if settings.has_key('client', 'walletpath'):
-        wallet = bitcoin_wallet(wallet_path=settings.get('client', 'walletpath'))
+        wallet = bitcoin_wallet(
+            wallet_path=settings.get('client', 'walletpath'))
     else:
         wallet = bitcoin_wallet()
     try:
         print("\n\nBitcoin Addresses: \n" + str(wallet.get_addresses()))
-    except Exception as e:
+    except Exception:
         print("Error: Wallet file not found.")
-        print("Type 'electrum create' to create a new wallet, or provide a path to a wallet with the -w option")
+        print("Type 'electrum create' to create a new wallet, or "
+              "provide a path to a wallet with the -w option")
 
-#Get bitcoin wallet fees
+
+# Get bitcoin wallet fees
 def wallet_getfees_bitcoin():
     settings = Settings()
     if settings.has_key('client', 'walletpath'):
-        wallet = bitcoin_wallet(wallet_path=settings.get('client', 'walletpath'))
+        wallet = bitcoin_wallet(
+            wallet_path=settings.get('client', 'walletpath'))
     else:
         wallet = bitcoin_wallet()
     try:
-        print("\n\nBitcoin Fees: \n" + str(bitcoin_wallet_util.get_network_fee()))
-    except Exception as e:
+        print("\n\nBitcoin Fees: \n"
+              + str(bitcoin_wallet_util.get_network_fee()))
+    except Exception:
         print("Error: Wallet file not found.")
-        print("Type 'electrum create' to create a new wallet, or provide a path to a wallet with the -w option")
+        print("Type 'electrum create' to create a new wallet, "
+              "or provide a path to a wallet with the -w option")
 
 
-#TODO PHILIP
+# TODO PHILIP
 def wallet_getbalance(args):
     if args.wallet_type == "ethereum":
         ethwallet = EthereumWallet()
@@ -487,7 +707,8 @@ def wallet_getbalance(args):
     elif args.wallet_type == "bitcoin":
         wallet_getbalance_bitcoin()
 
-#TODO PHILIP
+
+# TODO PHILIP
 def wallet_getaddress(args):
     if args.wallet_type == "ethereum":
         ethwallet = EthereumWallet()
@@ -495,18 +716,23 @@ def wallet_getaddress(args):
     elif args.wallet_type == "bitcoin":
         wallet_getaddress_bitcoin()
 
-#TODO PHILIP
+
+# TODO PHILIP
 def wallet_getprivatekey(args):
     if args.wallet_type == "ethereum":
         ethwallet = EthereumWallet()
-        print("\n\nEthereum Private Key: \n" + str(ethwallet.get_private_key()))
+        print("\n\nEthereum Private Key: \n"
+              + str(ethwallet.get_private_key()))
 
-#TODO PHILIP
+
+# TODO PHILIP
 def wallet_fees(args):
     if args.wallet_type == "ethereum":
-        print("\n\nEthereum AVG Fee: \n" + str(E_wallet_util.get_network_fee()) + " Gwei")
+        print("\n\nEthereum AVG Fee: \n"
+              + str(E_wallet_util.get_network_fee()) + " Gwei")
     elif args.wallet_type == "bitcoin":
         wallet_getfees_bitcoin()
+
 
 def vpn_purchase(args):
     if args.provider == "torguard":
@@ -518,55 +744,86 @@ def vpn_purchase(args):
     elif args.provider == "vpnac":
         vpnac_purchase_handler(args)
 
-#ADDED BY PHILIP
-def vpn_status_torguard(args):
-    print("\n_____________________STATUS TORGUARD_________________________\n")
-    vpnStatusMonitor = VpnStatusMonitor()
-    status = vpnStatusMonitor.get_status_torguard()
 
-    if status["webuser_email"] != None:
+# ADDED BY PHILIP
+def vpn_status_torguard(args):
+    print("\n_____________________STATUS TORGUARD"
+          "_________________________\n")
+    vpn_status_monitor = VpnStatusMonitor()
+    status_torguard = vpn_status_monitor.get_status_torguard()
+
+    if status_torguard["webuser_email"] is not None:
         print("\n\nYou have one purchased web account for torguard")
-        print("\n\tuser: " + status["webuser_email"])
-        print("\tpassword: " + status["webuser_password"])
-    else: print("\n\nYou have no web-purchase credentials stored locally")
-    if status["service_stored_user"] != None:
-        print("\n\nYou have the following available openvpn service credentials:")
-        print ("\n\tservice_user: " + status["service_stored_user"])
-        print ("\tservice_password: " + status["service_stored_password"])
-        if status["valid"] != None:
-            print("\tValid until: " + status["valid"])
-        else: print("\tValid until: Unknown")
-    else: print("\n\nYou have no stored torguard openvpn service credentials loccally")
+        print("\n\tuser: " + status_torguard["webuser_email"])
+        print("\tpassword: " + status_torguard["webuser_password"])
+    else:
+        print(
+            "\n\nYou have no web-purchase credentials "
+            "stored locally")
+    if status_torguard["service_stored_user"] is not None:
+        print("\n\nYou have the following available "
+              "openvpn service credentials:")
+        print(
+            "\n\tservice_user: "
+            + status_torguard["service_stored_user"])
+        print(
+            "\tservice_password: "
+            + status_torguard["service_stored_password"])
+        if status_torguard["valid"] is not None:
+            print("\tValid until: " + status_torguard["valid"])
+        else:
+            print("\tValid until: Unknown")
+    else:
+        print(
+            "\n\nYou have no stored torguard "
+            "openvpn service credentials loccally")
     print("\n\n")
 
-#ADDED BY PHILIP
+
+# ADDED BY PHILIP
 def vpn_status_vpnac(args):
 
-    print("\n_____________________STATUS VPNAC_________________________\n")
-    vpnStatusMonitor = VpnStatusMonitor()
-    status = vpnStatusMonitor.get_status_vpnac()
+    print("\n_____________________STATUS VPNAC"
+          "_________________________\n")
+    vpn_status_monitor = VpnStatusMonitor()
+    status_vpnac = vpn_status_monitor.get_status_vpnac()
 
-    if status["webuser_email"] != None:
+    if status_vpnac["webuser_email"] is not None:
         print("\n\nYou have one purchased web account for vpnac")
-        print("\n\tuser: " + status["webuser_email"])
-        print("\tpassword: " + status["webuser_password"])
-    else: print("\n\nYou have no web-purchase credentials stored locally")
-    if status["service_stored_user"] != None:
-        print("\n\nYou have the following available openvpn service credentials:")
-        print ("\n\tservice_user: " + status["service_stored_user"])
-        print ("\tservice_password: " + status["service_stored_password"])
-        if status["valid"] != None:
-            print("\tValid until: " + status["valid"])
-        else: print("\tValid until: Unknown")
-    else: print("\n\nYou have no stored vpnac openvpn service credentials loccally")
+        print("\n\tuser: " + status_vpnac["webuser_email"])
+        print("\tpassword: " + status_vpnac["webuser_password"])
+    else:
+        print(
+            "\n\nYou have no web-purchase "
+            "credentials stored locally")
+    if status_vpnac["service_stored_user"] is not None:
+        print(
+            "\n\nYou have the following available "
+            "openvpn service credentials:")
+        print(
+            "\n\tservice_user: "
+            + status_vpnac["service_stored_user"])
+        print(
+            "\tservice_password: "
+            + status_vpnac["service_stored_password"])
+        if status_vpnac["valid"] is not None:
+            print("\tValid until: " + status_vpnac["valid"])
+        else:
+            print("\tValid until: Unknown")
+    else:
+        print(
+            "\n\nYou have no stored vpnac "
+            "openvpn service credentials loccally")
     print("\n\n")
 
-#ADDED BY PHILIP
+
+# ADDED BY PHILIP
 def vpn_status_all(args):
-    vpnStatusMonitor = VpnStatusMonitor()
-    status = vpnStatusMonitor.get_status_purchased()
+    vpn_status_monitor = VpnStatusMonitor()
+    purchase_status = vpn_status_monitor.get_status_purchased()
     for aquired in purchased:
         print(str(aquired))
+
 
 # Checks the VPN subscription
 def vpn_subscription_status(args):
@@ -582,10 +839,12 @@ def vpn_subscription_status(args):
         vpn_status_all(args)
     pass
 
-#Get the expiration date of mullvad
+
+# Get the expiration date of mullvad
 def vpn_subscription_status_mullvad():
     m = MullVad()
     print(m.get_status())
+
 
 # Checks whether the VPN service is turned on or off.
 def vpn_status(args):
@@ -593,10 +852,12 @@ def vpn_status(args):
         vpn_status_mullvad()
     pass
 
-#Get the expiration date of mullvad
+
+# Get the expiration date of mullvad
 def vpn_status_mullvad():
     m = InstallMullvad()
     m.check_vpn()
+
 
 def vpn_turn_on(args):
     if args.provider == "torguard":
@@ -609,36 +870,51 @@ def vpn_turn_on(args):
         vpnac_turn_on_handler(args)
 
 
-#TODO PHILIP
+# TODO PHILIP
 def torguard_turn_on_handler(args):
-    print("\n_____________________CLOUDOMATE TORGUARD_________________________\n")
-    vpnsTorguard = installVpnTorguard()
+    print("\n_____________________CLOUDOMATE TORGUARD"
+          "_________________________\n")
+    vpns_torguard = InstallVpnTorguard()
 
-    if args.country == None:
-        print("\nPlease set valid --country option trough which you would like to route your traffic (set to 'random' for random)")
+    if args.country is None:
+        print("\nPlease set valid --country option trough which "
+              "you would like to route your traffic "
+              "(set to 'random' for random)")
         exit(0)
     if args.country == 'random':
         print("\nStarting vpn with routing trough random")
-        vpnsTorguard.startVpn()
+        vpns_torguard.start_vpn()
         exit(0)
 
-    list_countries = vpnsTorguard.getCountries()
+    list_countries = vpns_torguard.get_countries()
     if args.country == 'list':
-        print("\n\nCountries trough which traffic can be routed with torguard (set --country to 'random' for random):\n")
+        print("\n\nCountries trough which traffic can be routed with "
+              "torguard (set --country to 'random' for random):\n")
         for country in list_countries:
-            print( "\t\t" + country.replace('TorGuard.', '').replace('.ovpn', ''))
+            print(
+                "\t\t"
+                + country.replace('TorGuard.', '').replace('.ovpn', ''))
         exit(0)
     else:
         for country in list_countries:
-            if args.country == country.replace('TorGuard.', '').replace('.ovpn', ''):
-                print("\nStarting vpn with routing trough " + args.country)
-                vpnsTorguard.startVpn(country_route=country)
+            if args.country == \
+                    country.replace(
+                        'TorGuard.', '').replace('.ovpn', ''):
+                print("\nStarting vpn with routing trough "
+                      + args.country)
+                vpns_torguard.start_vpn(country_route=country)
                 exit(0)
-        print("\n" + '"' + args.country + '"' + " invalid option. Use 'list' to list options")
+        print(
+            "\n"
+            + '"'
+            + args.country
+            + '"'
+            + " invalid option. Use 'list' to list options")
         exit(0)
 
-#TODO KW DINESH
-#Install and turn on mullvad vpn
+
+# TODO KW DINESH
+# Install and turn on mullvad vpn
 def turn_on_handler_mullvad(args):
     m = InstallMullvad()
 
@@ -647,33 +923,46 @@ def turn_on_handler_mullvad(args):
     else:
         m.setup_vpn()
 
-#TODO PHILIP
-def vpnac_turn_on_handler(args):
-    print("\n_____________________CLOUDOMATE VPNAC_________________________\n")
-    vpnac = installVpnAC()
 
-    if args.country == None:
-        print("\nPlease set valid --country option trough which you would like to route your traffic (set to 'random' for random)")
+# TODO PHILIP
+def vpnac_turn_on_handler(args):
+    print("\n_____________________CLOUDOMATE VPNAC"
+          "_________________________\n")
+    vpnac = InstallVpnac()
+
+    if args.country is None:
+        print("\nPlease set valid --country option trough "
+              "which you would like to route your traffic "
+              "(set to 'random' for random)")
         exit(0)
     if args.country == 'random':
         print("\nStarting vpn with routing trough random")
-        vpnac.startVpn()
+        vpnac.start_vpn()
         exit(0)
 
-    list_countries = vpnac.getCountries()
+    list_countries = vpnac.get_countries()
     if args.country == 'list':
-        print("\n\nCountries trough which traffic can be routed with vpnac (set --country to 'random' for random):\n")
+        print("\n\nCountries trough which traffic can be routed "
+              "with vpnac (set --country to 'random' for random):\n")
         for country in list_countries:
-            print( "\t\t" + country.replace('-aes256-tcp', '').replace('.ovpn', ''))
+            print("\t\t" + country.replace('-aes256-tcp', '')
+                  .replace('.ovpn', ''))
         exit(0)
     else:
         for country in list_countries:
-            if args.country == country.replace('-aes256-tcp', '').replace('.ovpn', ''):
-                print("\nStarting vpn with routing trough " + args.country)
-                vpnac.startVpn(country_route=country)
+            if args.country == country.replace('-aes256-tcp', '')\
+                    .replace('.ovpn', ''):
+                print("\nStarting vpn with routing trough "
+                      + args.country)
+                vpnac.start_vpn(country_route=country)
                 exit(0)
-        print("\n" + '"' + args.country + '"' + " invalid option. Use 'list' to list options")
+        print("\n"
+              + '"'
+              + args.country
+              + '"'
+              + " invalid option. Use 'list' to list options")
         exit(0)
+
 
 def vpn_turn_off():
     # Kills all active openvpn connections

@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from cloudomate.util.captcha_account_manager import captchaAccountManager
+from cloudomate.util.captcha_account_manager import CaptchaAccountManager
 
 import re
 import random
@@ -47,7 +47,7 @@ class Infura(object):
         # Gets the Google Recaptcha key and the solution hash.
         soup = self.browser.get_current_page()
         datasite_key = soup.select("div.g-recaptcha")[0]["data-sitekey"]
-        c_manager_ = captchaAccountManager()
+        c_manager_ = CaptchaAccountManager()
         captcha_solver = RecaptchaSolver(c_manager_.get_api_key())
         solution = captcha_solver.solve_google_recaptcha(registration,
                                                          datasite_key)
