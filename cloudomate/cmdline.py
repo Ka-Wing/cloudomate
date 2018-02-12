@@ -768,7 +768,7 @@ def vpn_purchase(args):
 
 
 # ADDED BY PHILIP
-def vpn_status_torguard(args):
+def vpn_subscription_status_torguard(args):
     print("\n_____________________STATUS TORGUARD"
           "_________________________\n")
     vpn_status_monitor = VpnStatusMonitor()
@@ -803,7 +803,7 @@ def vpn_status_torguard(args):
 
 
 # ADDED BY PHILIP
-def vpn_status_vpnac(args):
+def vpn_subscription_status_vpnac(args):
 
     print("\n_____________________STATUS VPNAC"
           "_________________________\n")
@@ -840,7 +840,7 @@ def vpn_status_vpnac(args):
 
 
 # ADDED BY PHILIP
-def vpn_status_all(args):
+def vpn_subscription_status_all(args):
     vpn_status_monitor = VpnStatusMonitor()
     purchase_status = vpn_status_monitor.get_status_purchased()
     print("\n\nYour purchases:\n")
@@ -854,13 +854,13 @@ def vpn_status_all(args):
 # Checks the VPN subscription
 def vpn_subscription_status(args):
     if args.provider == 'torguard':
-        vpn_status_torguard(args)
+        vpn_subscription_status_torguard(args)
     elif args.provider == 'vpnac':
-        vpn_status_vpnac(args)
+        vpn_subscription_status_vpnac(args)
     elif args.provider == 'mullvad':
         vpn_subscription_status_mullvad()
     elif args.provider == None:
-        vpn_status_all(args)
+        vpn_subscription_status_all(args)
     pass
 
 
@@ -874,7 +874,11 @@ def vpn_subscription_status_mullvad():
 
 # Checks whether the VPN service is turned on or off.
 def vpn_status(args):
-    if args.provider == "mullvad":
+    if args.provider == None:
+        vpnStatusMonitor = VpnStatusMonitor()
+        print("\nRetrieving ip address..\n")
+        print("\n\nVPN activity:\n\n\t" + vpnStatusMonitor.getVpnIsActive() + "\n\n")
+    elif args.provider == "mullvad":
         vpn_status_mullvad()
     pass
 
@@ -886,7 +890,9 @@ def vpn_status_mullvad():
 
 
 def vpn_turn_on(args):
-    if args.provider == "torguard":
+    if args.provider == None:
+        print("\n\nPlease specify a purhcased vpn services you would like to turn on using the --provider option\n\n")
+    elif args.provider == "torguard":
         torguard_turn_on_handler(args)
     elif args.provider == "mullvad":
         turn_on_handler_mullvad(args)
@@ -990,7 +996,7 @@ def vpnac_turn_on_handler(args):
         exit(0)
 
 
-def vpn_turn_off():
+def vpn_turn_off(args):
     # Kills all active openvpn connections
     result = os.popen("sudo killall openvpn").read()
     print(result)

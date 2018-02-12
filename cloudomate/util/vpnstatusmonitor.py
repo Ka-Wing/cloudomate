@@ -109,6 +109,25 @@ class VpnStatusMonitor:
             purchased.append('vpnac')
         return purchased
 
+    #returns whether the traffic is currently being routed trough an ip address that is different from the one registered at time of instalation
+    def getVpnIsActive(self):
+        starting_ip_file = os.path.expanduser("~") + '/.config/server-ip-address.txt'
+        s_ip_address = None
+        if os.path.isfile(starting_ip_file):
+            file = open(starting_ip_file, "r")
+            lines = file.readlines()
+            file.close()
+            s_ip_address = lines[0].replace('\n', '').replace('\r', '')
+        else:
+            return 'Unknown'
+        c_ip = os.popen('curl ipv4bot.whatismyipaddress.com').read()
+        print("\nstarting ip: " + s_ip_address)
+        print("\ncurrent ip: " + c_ip)
+        if c_ip != s_ip_address:
+            return 'Active'
+        else:
+            return 'Not Active'
+
     def fetch_account_info(self, weblogin_user, weblogin_password):
         pass
 
