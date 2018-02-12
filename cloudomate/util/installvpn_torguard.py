@@ -4,7 +4,7 @@ import random
 import requests
 import re
 import time
-from cloudomate.util.torguard_web_retriever import torguardServiceRetriever
+from cloudomate.util.torguard_web_retriever import TorguardServiceRetriever
 
 
 class InstallVpnTorguard():
